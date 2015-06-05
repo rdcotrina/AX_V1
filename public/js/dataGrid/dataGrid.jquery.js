@@ -15,24 +15,22 @@
         
         dataGrid: function(opt){
             
-            
-            
             var defaults = {
-                tObjectContainer: $(this).attr('id'),              /*identificador del contenedor de la grilla*/
-                tObjectTable: null,              /*identificador de la grilla*/
-                tWidthFormat: 'px',                  /*para dimension de columnas*/
-                tChangeLength: true,                /*activa combo de registros a mostrar por pagina*/
-                tRegsLength: [10, 25, 50, 100],     /*para numero de registros por pagina*/
-                tColumns: [],                       /*columnas del header*/
+                tObjectContainer: $(this).attr('id'),               /*identificador del contenedor de la grilla*/
+                tObjectTable: null,                                 /*identificador de la grilla*/
+                tWidthFormat: 'px',                                 /*para dimension de columnas*/
+                tChangeLength: true,                                /*activa combo de registros a mostrar por pagina*/
+                tRegsLength: [10, 25, 50, 100],                     /*para numero de registros por pagina*/
+                tColumns: [],                                       /*columnas del header*/
                 tMsnNoData: 'No se encontraron registros.',
-                tNumbers: true,                 /*para mostrar la numeracion*/
-                sAjaxSource: null,                   /*url para la data via ajax*/
+                tNumbers: true,                                     /*para mostrar la numeracion*/
+                sAjaxSource: null,                                  /*url para la data via ajax*/
                 pPaginate: true,
                 pDisplayStart: 0,
                 pDisplayLength: 50,
                 pItemPaginas: 5,
-                pOrderField: '',                    /*para el order ASC o DESC*/
-                sAxions: [],                        /*acciones del grid*/
+                pOrderField: '',                                    /*para el order ASC o DESC*/
+                sAxions: [],                                        /*acciones del grid*/
                                
             };
             
@@ -40,25 +38,29 @@
             
             var _private = {};
             
-            _private.cssTable = 'table table-striped table-hover table-condensed dataTable table-bordered';
+            _private.cssTable       = 'table table-striped table-hover table-condensed dataTable table-bordered';
                     
-            _private.pFilterCols = '';                    /*sql generado mediante filtros avanzados*/
+            _private.pFilterCols    = '';                               /*sql generado mediante filtros avanzados*/
             
-            _private.positionAxion = 'last';            /*posicion de las acciones*/
+            _private.positionAxion  = 'last';                           /*posicion de las acciones*/
             
-            _private.btnFirst = 'fa fa-fast-backward';
+            _private.btnFirst       = 'fa fa-fast-backward';
             
-            _private.btnPrev  = 'fa fa-backward';
+            _private.btnPrev        = 'fa fa-backward';
             
-            _private.btnNext  =  'fa fa-forward';
+            _private.btnNext        =  'fa fa-forward';
             
-            _private.btnLast  = 'fa fa-fast-forward';
+            _private.btnLast        = 'fa fa-fast-forward';
                 
-            _private.iniInfo = 0;
+            _private.iniInfo        = 0;
             
-            _private.finInfo = 0;
+            _private.finInfo        = 0;
             
-            _private.totalInfo = 0;
+            _private.totalInfo      = 0;
+            
+            _private.colspanRecords = 0;
+            
+            _private.ifSearch = false;
             
             /*
              * Rretorna info sobre cantidad de registros
@@ -78,9 +80,7 @@
             
             _private.endLoading = function(oSettings){
                 $('#btnRefresh_'+oSettings.tObjectTable).html('<i class="fa fa-refresh"></i>').attr('disabled',false);
-            };
-            
-            _private.colspanRecords = 0;
+            };           
             
             /*
              * Ejecuta el scroll
@@ -188,6 +188,65 @@
             };
             
             /*
+             * Crea controles para busqueda por columnas
+             * @param {type} oSettings
+             * @returns {$}
+             */
+            _private.addSearchCols = function(oSettings){
+                var tr = $('<tr></tr>'),
+                    chkExist = 0;
+                
+                /*agregando <th> por numeracion*/
+                if(oSettings.tNumbers){
+                    var th = $('<th></th>');         
+                    tr.append(th);                              /*se agrega al <tr>*/
+                }
+                
+                /*agregando <th> por txt de accion al inicio de cabecera*/
+                if (_private.positionAxion.toLowerCase() === 'first') {
+                    var th = $('<th></th>');         
+                    tr.append(th);                              /*se agrega al <tr>*/
+                }
+                
+                /*agregando <th> por el checkbox al inicio*/
+                if(oSettings.sCheckbox !== undefined && oSettings.sCheckbox instanceof Object){
+                    var pos = (oSettings.sCheckbox.position !== undefined) ? oSettings.sCheckbox.position : 'first';
+                    if(pos.toLowerCase() === 'first'){                        
+                        var th = $('<th></th>');                  
+                        tr.append(th);                          /*se agrega al <tr>*/                       
+                        chkExist = 1;
+                    }
+                }   
+                
+                /*recorrido de columnas, creando los filtros*/
+                for (var c in oSettings.tColumns) {
+                    var th = $('<th></th>');                    /*se crea la columna*/
+                    
+                    CREAR LOS FILTROS
+                    
+                    
+                    tr.append(th);                              /*se agrega al <tr>*/ 
+                }
+                
+                /*agregando <th> por el checkbox al final*/
+                if(oSettings.sCheckbox !== undefined && oSettings.sCheckbox instanceof Object && chkExist === 0){
+                    var pos = (oSettings.sCheckbox.position !== undefined) ? oSettings.sCheckbox.position : 'last';
+                    if(pos.toLowerCase() === 'last'){                        
+                        var th = $('<th></th>');         
+                        tr.append(th);                          /*se agrega al <tr>*/
+                    }
+                }
+                
+                /*agregando <th> por txt de accion al final de cabecera*/
+                if (_private.positionAxion.toLowerCase() === 'last') {
+                    var th = $('<th></th>');         
+                    tr.append(th);                              /*se agrega al <tr>*/
+                }
+                
+                return tr;
+            };
+            
+            /*
              * Crea la cabecera de la tabla
              * @param {type} oSettings
              * @returns {undefined}
@@ -235,6 +294,10 @@
                     th.css({width: width, 'vertical-align': 'middle'});                                          /*agregando width de columna*/
                     th.append(title);                                                 /*se agrega el titulo*/
 
+                    if(!search){    /*se verifica si existe busquedas por columnas*/
+                        _private.ifSearch = true;
+                    }
+                    
                     tr.append(th);                                                  /*se agrega al <tr>*/
                     _private.colspanRecords++;
                 }
@@ -253,7 +316,13 @@
                     tr.append(_private.headAxion(oSettings));
                 }
                 
-                h.html(tr);                                         /*se agrega <tr> al <thead>*/
+                h.html(tr);                                         /*se agrega <tr> de cabeceras al <thead>*/
+                
+                /*agregando controles para busqueda por columna*/ 
+                if(_private.ifSearch){
+                    h.html(_private.addSearchCols(oSettings));      /*se agrega <tr> de busquedas al <thead>*/ 
+                }
+                
                 $('#' + oSettings.tObjectTable).append(h);          /*se agrega <thead> al <table>*/
             };
             
@@ -1067,8 +1136,6 @@
                 }
             };
             
-            
-            
             return this.each(function(){
                 
                 var oSettings = options;
@@ -1089,6 +1156,7 @@
                             }
                         });
                     },
+                    
                     /*
                      * Evento para cbChange
                      * @param {type} oSettings
