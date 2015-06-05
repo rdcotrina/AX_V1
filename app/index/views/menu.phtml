@@ -1,0 +1,131 @@
+<?php
+/*
+ * Documento   : menu
+ * Creado      : 04-feb-2014, 9:40:21
+ * Autor       : RDCC
+ * Descripcion :
+ */
+$dominioTMP = '';
+$menuPrincipalTMP = '';
+$moduloTMP = '';
+
+if (Session::get('sys_menu')):
+    $dominioTMP = '';
+    $permisos = array();
+
+    foreach (Session::get('sys_menu') as $value) :
+
+        /* acciones de una opcion */
+        $acciones = Obj::run()->indexController->getAccionesOpcion($value['id_rolopcion']);
+        
+        $aliasopcion = $value['aliasopcion'];
+
+        /* creando array de permisos */
+
+        foreach ($acciones as $val) {
+            $permisos[] = array(
+                'opcion' => $aliasopcion . $val['aliasaccion'],
+                'accion' => $val['accion'],
+                'icono' => $val['icono'],
+                'theme' => $val['theme'],
+                'permiso' => ($val['estado'] == 'A')?'1':'0'
+            );
+        }
+
+    endforeach;
+endif;
+/* crear sesion de permisos */
+Session::set('sys_permisos', $permisos);
+
+?>
+                    
+
+<?php foreach (Session::get('sys_menu') as $menu): 
+        /*tiene que ser del mismo dominio*/
+            /*modulo no debe repetirse*/
+            if($menu['id_dominio'] != $dominioTMP):
+?> 
+    <li>
+        <a href="javascript:;" class="cortar"><i class="<?php echo $menu['icon']; ?>"></i> <span class="menu-item-parent"><?php echo $menu['dominio']; ?></span></a>
+        <ul>
+            <?php
+                /*menu principal del modulo*/
+                foreach (Session::get('sys_menu') as $menuprincipal):
+                    
+                    
+                    if($menuprincipal['id_dominio'] == $menu['id_dominio']):
+                        
+                        /*verificar q no se repitan*/
+                        if($menuprincipal['id_modulo'] !== $menuPrincipalTMP):
+                            
+            ?>
+                    <li>
+                        <a href="javascript:;" class="cortar"><?php echo $menuprincipal['modulo'];?></a>
+                        <ul>
+                            <?php
+                                /*las opciones de menu principal*/
+                                foreach (Session::get('sys_menu') as $opciones):
+                                    if($opciones['id_dominio'] == $menu['id_dominio'] && $opciones['id_modulo'] == $menuprincipal['id_modulo']):
+                                        /*verificar que no se repita*/
+                                        if($opciones['id_menu'] != $moduloTMP):
+                            ?>
+                                        <li>
+                                            <a href="javascript:;" class="cortar" ><?php echo $opciones['menu']; ?></a>
+                                            <ul>
+                                                <?php
+                                                    foreach(Session::get('sys_menu') as $opc):
+                                                        if($opciones['id_dominio'] == $menu['id_dominio'] && $opciones['id_modulo'] == $menuprincipal['id_modulo'] && $opciones['id_menu'] == $opc['id_menu']):
+                                                ?>
+                                                <li>
+                                                    <a href="javascript:;" class="cortar" title="<?php echo $opc['opcion']; ?>" onclick="<?php echo $opc['url']; ?>"><?php echo $opc['opcion']; ?></a>
+                                                </li>   
+                                                <?php
+                                                        endif;
+                                                    endforeach;
+                                                ?>
+                                            </ul>
+                                        </li>
+                            <?php
+                                        endif;
+                                        $moduloTMP = $opciones['id_menu'];
+                                    endif;
+                                endforeach;
+                            ?>
+                        </ul>
+                    </li>
+            <?php
+                        endif;
+                        $menuPrincipalTMP = $menuprincipal['id_modulo'];
+                    endif;
+                endforeach;
+            ?>
+        </ul>
+    </li>
+<?php 
+        endif;
+        $dominioTMP = $menu['id_dominio'];
+endforeach;?>
+<script>
+//    function noneEvtMenu(){
+//        if($('#nav_modulos').length > 0){
+//            /*para hacer evento invisible*/
+//            simpleScript.removeAttr.click({
+//                container: '#nav_modulos',
+//                typeElement: 'a'
+//            });
+//            $('nav ul').jarvismenu({
+//                    accordion : true,
+//                    speed : $.menu_speed,
+//                    closedSign : '<em class="fa fa-expand-o"></em>',
+//                    openedSign : '<em class="fa fa-collapse-o"></em>'
+//            });
+//        }
+//    }
+    setTimeout(function(){
+        axScript.removeAttr.click({
+            container: '#nav_modulos',
+            typeElement: 'a'
+        });
+    },9000);
+var sys_permisos = <?php echo json_encode(Session::get('sys_permisos')) ?>
+</script>

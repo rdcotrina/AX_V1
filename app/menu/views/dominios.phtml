@@ -1,0 +1,159 @@
+<?php
+/*
+ * Documento   : dominios
+ * Creado      : 11-jul-2014
+ * Autor       : ..... .....
+ * Descripcion : 
+ */
+$nuevo = Session::getPermiso('MNUNEW');
+$eliminar = Session::getPermiso('MNUDE');
+$editar = Session::getPermiso('MNUED');
+
+$dataDom = Obj::run()->MenuController->getDominios();
+?>
+<!--RECORRIDO DOMINIOS-->
+<ul class="<?php echo T3 ?>ul-dominios">
+    <?php
+    foreach ($dataDom as $keyDo=>$do):
+        ++$keyDo;
+        $txt = '';
+        $label = 'label label-success';
+        if ($do['estado'] == 'I') {
+            $txt = 'text-decoration:line-through;';
+            $label = 'label label-danger';
+        }
+        ?>
+
+        <li id="<?php echo $keyDo?>" data-id="<?php echo AesCtr::en($do['id_dominio']) ?>" data-nivel="DO" data-doorden="<?php echo $do['id_dominio'] ?>" class="menuRight" style="float: left;display: inline;margin-left: 10px">
+            <span class="clickColapse <?php echo $label ?> txt-color-white" style="width: 100%">
+                <div class="cortar" style="width: 200px;<?php echo $txt ?>">
+                    <i class="fa fa-lg fa-folder-open"></i> <?php echo $do['dominio'] ?>
+                </div>
+                <em class="badge pull-right bg-color-blueDark numOpc"><?php echo $do['allOpc'] ?></em>
+            </span>
+
+            <!--MODULOS-->
+            <ul class="<?php echo T3 ?>ul-modulos">
+                <?php
+                $dataModulo = Obj::run()->MenuController->getModulos($do['id_dominio']);
+                foreach ($dataModulo as $keyMO=>$mod):
+                    ++$keyMO;
+                    $txtD = '';
+                    $labelD = 'label label-default';
+                    if ($mod['estado'] == 'I') {
+                        $txtD = 'text-decoration:line-through;';
+                        $labelD = 'label label-danger';
+                    }
+                    ?>
+                    <li id="<?php echo $keyDo.$keyMO?>" data-id="<?php echo AesCtr::en($mod['id_modulo']) ?>" data-moorden="<?php echo $mod['id_modulo'] ?>" data-dominio="<?php echo AesCtr::en($do['id_dominio']) ?>" data-nivel="MO" class="menuRight">
+                        <span class="clickColapse <?php echo $labelD ?> txt-color-white">
+                            <div class="cortar" style="width: 200px;<?php echo $txtD?>">
+                                <i class="fa fa-lg fa-plus-circle"></i> <?php echo $mod['modulo'] ?>
+                            </div>
+                            <em class="badge pull-right bg-color-blueDark numOpc"><?php echo $mod['allOpc'] ?></em>
+                        </span>    
+
+                        <!--RECORRIDO MENU-->
+                        <ul class="<?php echo T3 ?>ul-menus">
+                            <?php
+                            $dataMenu = Obj::run()->MenuController->getMenus($mod['id_modulo']);
+                            foreach ($dataMenu as $keyMNU=>$men):
+                                ++$keyMNU;
+                                $txtM = '';
+                                $labelM = 'label label-info';
+                                if ($men['estado'] == 'I') {
+                                    $txtM = 'text-decoration:line-through;';
+                                    $labelM = 'label label-danger';
+                                }
+                                ?>
+                                <li id="<?php echo $keyDo.$keyMO.$keyMNU?>" data-id="<?php echo AesCtr::en($men['id_menu']) ?>" data-meorden="<?php echo $men['id_menu'] ?>" data-modulo="<?php echo AesCtr::en($mod['id_modulo']) ?>" data-nivel="MNU">
+                                    <span class="clickColapse <?php echo $labelM ?> txt-color-white">
+                                        <div class="cortar" style="width: 180px;<?php echo $txtM ?>">
+                                            <i class="fa fa-lg fa-plus-circle"></i> <?php echo $men['menu'] ?>
+                                        </div> 
+                                        <em class="badge pull-right bg-color-blueDark numOpc"><?php echo $men['allOpc'] ?></em>
+                                    </span>
+
+                                    <!--RECORRIDO OPCIONES-->
+                                    <ul class="<?php echo T3 ?>ul-opciones">
+                                        <?php
+                                        $dataOpcion = Obj::run()->MenuController->getOpciones($men['id_menu']);
+                                        foreach ($dataOpcion as $keyOPC=>$opc):
+                                            ++$keyOPC;
+                                            $txtO = '';
+                                            $labelO = 'label label-primary';
+                                            if ($opc['estado'] == 'I') {
+                                                $txtO = 'text-decoration:line-through;';
+                                                $labelO = 'label label-danger';
+                                            }
+                                            ?>
+                                            <li class="opciones" id="<?php echo $keyDo.$keyMO.$keyMNU.$keyOPC?>" data-id="<?php echo AesCtr::en($opc['id_opcion']) ?>" data-opcorden="<?php echo $opc['id_opcion'] ?>" data-menu="<?php echo AesCtr::en($men['id_menu']) ?>" data-nivel="OPC" data-disabled="new">
+                                                <span class="<?php echo $labelO ?> txt-color-white">
+                                                    <div class="cortar" style="width: 120px;<?php echo $txtO ?>">
+                                                        <i></i> <?php echo $opc['opcion'] ?>
+                                                    </div>
+                                                </span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    <!--FIN RECORRIDO OPCIONES-->
+
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <!--FIN BRECORRIDO MENU-->
+                    </li>
+
+                <?php endforeach; ?>
+            </ul>
+            <!--FIN MODULOS-->
+
+        </li>
+    <?php endforeach; ?>
+</ul>
+
+<!--MENU DERECHO-->
+<ul id="<?php echo T3 ?>myMenuRright" class="contextMenu">
+    <?php if ($nuevo['permiso']): ?>
+        <li class="new separator"><a href="javascript:;" data-href="NEW"><?php echo $nuevo['accion']; ?></a></li>
+    <?php endif; ?>
+    <?php if ($editar['permiso']): ?>
+        <li class="edit separator"><a href="javascript:;" data-href="EDIT"><?php echo $editar['accion']; ?></a></li>
+    <?php endif; ?>
+    <?php if ($eliminar['permiso']): ?>
+        <li class="delete separator"><a href="javascript:;" data-href="DELETE"><?php echo $eliminar['accion']; ?></a></li>
+    <?php endif; ?>
+</ul>
+<!--FIN MENU DERECHO-->
+
+
+
+<div class="clearfix"></div>
+
+<!-- TREE -->
+<script src="<?php echo $rutaLayout['_js']; ?>plugin/bootstraptree/bootstrap-tree.min.js"></script>
+
+<script>
+
+    /*collapsar todo y activar menu derecho*/
+    $(document).ready(function () {
+        $('.clickColapse').click();
+
+        MenuScript.sortable();
+
+        MenuScript.menuRight();
+        
+        
+        /*ocultar las opciones*/
+        setTimeout(function(){
+            $('.opciones').attr('style','display:none');
+        },1000);
+    
+        /*para hacer evento invisible*/
+        axScript.removeAttr.click({
+            container: '.<?php echo T3 . 'ul-dominios'; ?>',
+            typeElement: 'button, a'
+        });
+    
+    });
+</script>

@@ -1,0 +1,14 @@
+<?php
+    $nuevo = Session::getPermiso('MNUNEW');
+?>
+<p>
+<?php if ($nuevo['permiso']): ?>
+    <button id="<?php echo T3?>btnNew" class="<?php echo $nuevo['theme']; ?>" onclick="Menu.getNuevoDominio()"><i class="<?php echo $nuevo['icono']; ?>"></i> <?php echo $nuevo['accion']; ?></button>
+<?php endif; ?>
+</p>
+
+<div class="cont-listadominios tree smart-form" style="width:80%;margin:auto"></div>
+
+<script>
+    Menu.getListaDominios();
+</script>

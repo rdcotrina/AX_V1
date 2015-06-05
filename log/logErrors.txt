@@ -1,0 +1,20 @@
+
+ERROR EN EL CLIENTE:
+====================
+Fecha: 31-05-2015 10:05:18
+Archivo: http://localhost/AX_V1/app/Acciones/views/js/Acciones.js?397672967647929
+Método: Acciones_/_public.main/&lt;.fnCallback
+Error: Menu is not defined
+Línea: 35
+Columna: 20
+
+
+ERROR EN EL SERVIDOR:
+====================
+Fecha: 31-05-2015 11:05:17
+Archivo: D:\xampp\htdocs\AX_V1\bin\View.php
+Método: render
+Error: Error de vista: <b>D:\xampp\htdocs\AX_V1\app\acciones\views\index.phtml</b> no encontrada .
+Línea: 54
+
+
