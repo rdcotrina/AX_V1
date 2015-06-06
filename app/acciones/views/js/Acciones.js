@@ -42,7 +42,7 @@ var Acciones_ = function() {
                 },
                 fnCallback: function(data) {
                     $('#' + tabs.T2 + '_CONTAINER').html(data);
-                    Acciones.getGridAcciones();
+                    //Acciones.getGridAcciones();
                     Acciones.getGridAcciones2();
                 }
             });
@@ -60,10 +60,10 @@ var Acciones_ = function() {
             tRegsLength: [3, 25, 50, 100],
             pDisplayLength: 3,
             tColumns: [
-                {title: lang.Acciones.AXION,campo: "accion",width: "300",sortable: true,search: {operator:"LIKE"}},
-                {title: lang.Acciones.DISEN, campo: "disenio", width: "220", search:{operator:"LIKE"}},
-                {title: lang.Acciones.ALAIS, campo: "alias", width: "220", sortable: true,search:{operator:"LIKE"}},
-                {title: lang.generic.EST, campo: "estado", width: "220", sortable: true, class: "center",search:{operator:"LIKE"}}
+                {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,search: {operator:"LIKE"}},
+                {title: lang.Acciones.DISEN, field: "disenio", width: "220", search:{operator:"LIKE"}},
+                {title: lang.Acciones.ALAIS, field: "alias", width: "220", sortable: true,search:{operator:"LIKE"}},
+                {title: lang.generic.EST, field: "estado", width: "220", sortable: true, class: "center",search:{operator:"LIKE"}}
             ],
             pPaginate: true,
             sAxions: {
@@ -112,13 +112,24 @@ var Acciones_ = function() {
         var pEdit   = axScript.getPermiso("ACCED");
         var pDelete = axScript.getPermiso("ACCDE");
 
+        var pr1 = 43;
+        var pr2 = 57;
+        
         $("#"+tabs.T2+"gridAcciones2").dataGrid({
             tWidthFormat: "px",
             tScrollY: "200px",
             tRegsLength: [3, 25, 50, 100],
             pDisplayLength: 3,
+            sCheckbox: {
+                serverValues: ['alias','estado'],
+                clientValues: [pr1,pr2],
+                attrServerValues: [
+                    {alias: 'alias'},
+                    {estado: 'estado'}
+                ]
+            },
             tColumns: [
-                {title: lang.Acciones.AXION,campo: "accion",width: "330",sortable: true,search: {operator:"LIKE"},
+                {title: lang.Acciones.AXION,field: "accion",width: "330",sortable: true,search: {type:"date"},
                     ajax:{
                         flag: 11,
                         fn: 'Acciones.lafuncionjs',
@@ -126,8 +137,8 @@ var Acciones_ = function() {
                         clientParams:['$("#tab_TAB_CRDACgridAcciones2_cbLength").val()','$("#tab_TAB_CRDACgridAcciones_cbLength").val()']
                     }
                 },
-                {title: lang.Acciones.DISEN, campo: "disenio", width: "280", search:{operator:"LIKE"}},
-                {title: lang.Acciones.ALAIS, campo: "alias", width: "250", sortable: true,search:{operator:"LIKE"},
+                {title: lang.Acciones.DISEN, field: "disenio", width: "280", search:{type:"time"}},
+                {title: lang.Acciones.ALAIS, field: "alias", width: "250", sortable: true,search:{type:"select"},
                     fnCallback:function(fila,row){
                         if(row.alias == 'GR'){
                             return 'modificado_'+fila;
@@ -136,7 +147,7 @@ var Acciones_ = function() {
                         }
                     }
                 },
-                {title: lang.generic.EST, campo: "estado", width: "250", sortable: true, class: "center",search:{operator:"LIKE"}}
+                {title: lang.generic.EST, field: "estado", width: "250", sortable: true, class: "center",search:{type:"text"}}
             ],
             pPaginate: true,
             sAxions: {

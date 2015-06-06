@@ -16,28 +16,11 @@ echo SimpleForm::widgetOpen(array(
 ?>
 
 
-<div id="<?php echo T2; ?>gridAcciones"></div>
-<br><br><br><br>
 <div id="<?php echo T2; ?>gridAcciones2"></div>
+<br><br><br><br>
+<div id="<?php echo T2; ?>gridAcciones"></div>
 
 
-
-<div id="<?php echo T2; ?>gridAcciones_btns">
-    <!-- verificar permisos -->
-    <?php if($nuevo["permiso"]): ?>
-    <button id="<?php echo T2; ?>btnNewEmpleados" type="button" onclick="" class="<?php echo $nuevo["theme"]; ?>">
-        <i class="<?php echo $nuevo["icono"]; ?>"></i> <?php echo $nuevo["accion"]; ?>
-    </button>
-    <?php endif; ?>
-</div>
-<table  class="table table-striped table-hover table-condensed dataTable table-bordered" ></table>    
-<?php echo SimpleForm::widgetClose(); ?>
-<script>
-axScript.removeAttr.click({
-    container: "#"+tabs.T2+"gridAcciones_tools",
-    typeElement: "button"
-});      
-</script>
 
 
 
@@ -50,11 +33,5 @@ axScript.removeAttr.click({
     </button>
     <?php endif; ?>
 </div>
-<table  class="table table-striped table-hover table-condensed dataTable table-bordered" ></table>    
+
 <?php echo SimpleForm::widgetClose(); ?>
-<script>
-axScript.removeAttr.click({
-    container: "#"+tabs.T2+"gridAcciones2_tools",
-    typeElement: "button"
-});      
-</script>

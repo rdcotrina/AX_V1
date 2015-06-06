@@ -60,7 +60,11 @@
             
             _private.colspanRecords = 0;
             
-            _private.ifSearch = false;
+            _private.ifSearch       = false;
+            
+            _private.ifDatePicker   = false;
+            
+            _private.ifTimePicker  = false;
             
             /*
              * Rretorna info sobre cantidad de registros
@@ -220,9 +224,82 @@
                 
                 /*recorrido de columnas, creando los filtros*/
                 for (var c in oSettings.tColumns) {
-                    var th = $('<th></th>');                    /*se crea la columna*/
+                    var elementSearch = null;                          /*el filtro*/
+                    var cont;
+                    var kfield = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '';
+                    var search = (oSettings.tColumns[c].search !== undefined) ? oSettings.tColumns[c].search : false;   /*para activar busqueda de columnas*/
                     
-                    CREAR LOS FILTROS
+                    th.addClass('hasinput');
+                    
+                   /*verificar si se configuro la busqueda*/
+                   if (search instanceof Object && search !== false) {
+                        var th = $('<th></th>');                    /*se crea la columna*/
+                        var tipo    = (search.type !== undefined) ? search.type : 'text';                  /*tipo de elemento*/
+                        var field   = (search.compare !== undefined) ? search.compare : kfield;            /*el campo q se buscara, en caso oSettings.tColumns[c].campo no sea util*/
+                        var idField = 'input_search_'+oSettings.tObjectTable+'_'+field;
+                        var icon = null;           /*para el icono del field*/
+                        
+                        /*switch segun type de objeto*/
+                        switch (tipo.toLowerCase()) {
+                            case 'text':
+                                elementSearch = $('<input></input>');
+                                elementSearch.attr('type','text');
+                                
+                                cont = $('<label></label>');
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                break;
+                            case 'select':
+                                elementSearch = $('<select></select>');
+                                
+                                cont = $('<label></label>');
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                break;
+                            case 'date':
+                                _private.ifDatePicker = true;
+                                
+                                elementSearch = $('<input></input>');
+                                elementSearch.addClass('datepickerGrid');
+                                elementSearch.attr('type','text');
+                               
+                                icon = $('<label></label>');
+                                icon.attr('for',idField);
+                                icon.attr('class','glyphicon glyphicon-calendar');
+                                
+                                cont = $('<label></label>');
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                
+                                break;
+                            case 'time':
+                                _private.ifTimePicker = true;
+                                
+                                elementSearch = $('<input></input>');
+                                elementSearch.addClass('timepickerGrid');
+                                elementSearch.attr('type','text');
+                                
+                                icon = $('<label></label>');
+                                icon.attr('for',idField);
+                                icon.attr('class','glyphicon glyphicon-time');
+                                
+                                cont = $('<label></label>');
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                break;
+                        }
+                        
+                        elementSearch.attr('id',idField);
+                        elementSearch.addClass('form-control');
+                        elementSearch.attr('field',field);
+                        
+                        cont.addClass('icon-addon');                      /*para los iconos*/
+                        
+                        th.html(cont);
+                        
+                   }else{ /*no se activo search*/
+                       
+                   }
                     
                     
                     tr.append(th);                              /*se agrega al <tr>*/ 
@@ -284,7 +361,7 @@
                     var th = $('<th></th>');         /*se crea la columna*/
 
                     var title   = (oSettings.tColumns[c].title !== undefined) ? oSettings.tColumns[c].title : '';
-                    var campo   = (oSettings.tColumns[c].campo !== undefined) ? oSettings.tColumns[c].campo : '';
+                    var field   = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '';
                     var sortable= (oSettings.tColumns[c].sortable !== undefined) ? ' sorting' : '';
                     var width   = (oSettings.tColumns[c].width !== undefined) ? oSettings.tColumns[c].width + oSettings.tWidthFormat : '';
                     var search  = (oSettings.tColumns[c].search !== undefined) ? oSettings.tColumns[c].search : false;   /*para activar busqueda de columnas*/
@@ -294,7 +371,7 @@
                     th.css({width: width, 'vertical-align': 'middle'});                                          /*agregando width de columna*/
                     th.append(title);                                                 /*se agrega el titulo*/
 
-                    if(!search){    /*se verifica si existe busquedas por columnas*/
+                    if(search instanceof Object){    /*se verifica si existe busquedas por columnas*/
                         _private.ifSearch = true;
                     }
                     
@@ -317,10 +394,10 @@
                 }
                 
                 h.html(tr);                                         /*se agrega <tr> de cabeceras al <thead>*/
-                
+              
                 /*agregando controles para busqueda por columna*/ 
                 if(_private.ifSearch){
-                    h.html(_private.addSearchCols(oSettings));      /*se agrega <tr> de busquedas al <thead>*/ 
+                    h.append(_private.addSearchCols(oSettings));      /*se agrega <tr> de busquedas al <thead>*/ 
                 }
                 
                 $('#' + oSettings.tObjectTable).append(h);          /*se agrega <thead> al <table>*/
@@ -1072,7 +1149,7 @@
                                 serverParams= (ajax.serverParams !== undefined) ? ajax.serverParams : '';  /*parametros desde el servidor*/
                             }
 
-                            var texto = data[r][oSettings.tColumns[c].campo];
+                            var texto = data[r][oSettings.tColumns[c].field];
                             
                             /*agregando ajax*/
                             if (fn) {
@@ -1091,7 +1168,7 @@
                                 fn = fn + '(' + xparams + ')';
                                 texto = $('<a></a>');
                                 texto.attr('href','javascript:;');
-                                texto.html(data[r][oSettings.tColumns[c].campo]);
+                                texto.html(data[r][oSettings.tColumns[c].field]);
                                 texto.attr('onclick',fn);
                             }
                             td.html(texto);                         /*contenido original de <td>*/
@@ -1187,6 +1264,26 @@
                         /*se valida se data sera via ajax*/
                         if (oSettings.ajaxSource) {
                             this.sendAjax(oSettings);
+                        }
+                        
+                        /*verificar si se aplica datepicker*/
+                        if(_private.ifTimePicker){
+                            $('.datepickerGrid').datepicker({
+                                prevText: '<i class="fa fa-chevron-left"></i>',
+                                nextText: '<i class="fa fa-chevron-right"></i>',
+                                changeMonth: true,
+                                changeYear: true,
+                                dateFormat: 'dd-mm-yy'
+                            });
+                            $('.datepickerGrid').mask('99-99-9999');
+                        }
+                        
+                        /*verificar si se aplica clockpicker*/
+                        if(_private.ifTimePicker){
+                            $('.timepickerGrid').clockpicker({
+                                autoclose: true
+                            });
+                            $('.timepickerGrid').mask('99:99');
                         }
                     },
                     

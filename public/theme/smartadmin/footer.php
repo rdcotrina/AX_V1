@@ -38,6 +38,9 @@
 
     <!-- JQUERY SELECT2 INPUT -->
     <script src="<?php echo $rutaLayout['_js']; ?>plugin/select2/select2.min.js"></script>
+    
+    <!-- JQUERY CLOCKPICKER -->
+    <script src="<?php echo $rutaLayout['_js']; ?>plugin/clockpicker/clockpicker.min.js"></script>
 
     <!-- JQUERY UI + Bootstrap Slider -->
     <script src="<?php echo $rutaLayout['_js']; ?>plugin/bootstrap-slider/bootstrap-slider.min.js"></script>

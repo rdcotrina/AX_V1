@@ -54,7 +54,7 @@
     <div class="project-context hidden-xs">
 
         <span class="label">Usuario:</span>
-        <span class="project-selector dropdown-toggle" data-toggle="dropdown"><?php echo Session::get('sys_nombreUsuario')?></span>
+        <span class="project-selector dropdown-toggle" data-toggle="dropdown"><?php echo Session::get('sys_nombreUsuario') ?></span>
     </div>
     <!-- end projects dropdown -->
 
@@ -73,7 +73,7 @@
         <ul id="mobile-profile-img" class="header-dropdown-list hidden-xs padding-5">
             <li class="">
                 <a href="#" class="dropdown-toggle no-margin userdropdown" data-toggle="dropdown"> 
-                    <img src="<?php echo $rutaLayout['_img']; ?>avatars/sunny.png" alt="<?php echo Session::get('sys_nombreUsuario')?>" title="<?php echo Session::get('sys_nombreUsuario')?>" class="online" />  
+                    <img src="<?php echo $rutaLayout['_img']; ?>avatars/sunny.png" alt="<?php echo Session::get('sys_nombreUsuario') ?>" title="<?php echo Session::get('sys_nombreUsuario') ?>" class="online" />  
                 </a>
                 <ul class="dropdown-menu pull-right">
                     <li>
@@ -110,7 +110,7 @@
             <span> <a href="javascript:;" data-action="userLogout" title="Cerrar sesión" data-logout-msg="Usted puede mejorar su seguridad aún más después de cerrar la sesión al cerrar este navegador abierto"><i class="fa fa-sign-out"></i></a> </span>
         </div>
         <!-- end logout button -->
-        
+
         <!-- fullscreen button -->
         <div id="fullscreen" class="btn-header transparent pull-right">
             <span> <a href="javascript:void(0);" data-action="launchFullscreen" title="Full Screen"><i class="fa fa-arrows-alt"></i></a> </span>
@@ -142,7 +142,7 @@
             <li>
                 <!--rol por defecto-->
                 <?php foreach (Session::get('sys_roles') as $value) : ?>
-                    <?php if($value['id_rol'] == Session::get('sys_defaultRol')): ?>
+                    <?php if ($value['id_rol'] == Session::get('sys_defaultRol')): ?>
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <span> <?php echo $value['rol']; ?> </span> <i class="fa fa-angle-down"></i> </a>
                     <?php endif; ?>
                 <?php endforeach; ?>
@@ -150,14 +150,14 @@
                 <!--cargar roles-->
                 <ul class="dropdown-menu pull-right">
                     <?php foreach (Session::get('sys_roles') as $value) : ?>
-                        <?php   
-                            if($value['id_rol'] == Session::get('sys_defaultRol')){
-                                $classactive = 'active';
-                                $click = "";
-                            }else{
-                                $classactive = '';
-                                $click = "Index.getChangeRol('".$value['id_rol']."');";
-                            }
+                        <?php
+                        if ($value['id_rol'] == Session::get('sys_defaultRol')) {
+                            $classactive = 'active';
+                            $click = "";
+                        } else {
+                            $classactive = '';
+                            $click = "Index.getChangeRol('" . $value['id_rol'] . "');";
+                        }
                         ?>
                         <li class="<?php echo $classactive; ?>">
                             <a href="javascript:void(0);" onclick="<?php echo $click; ?>"><?php echo $value['rol']; ?></a>
@@ -168,7 +168,7 @@
             </li>
         </ul>
         <!-- end multiple lang -->
-        
+
     </div>
     <!-- end pulled right: nav area -->
 
@@ -185,11 +185,11 @@
         <span> <!-- User image size is adjusted inside CSS, it should stay as it --> 
 
             <a href="javascript:void(0);">
-                    <img src="<?php echo $rutaLayout['_img']; ?>avatars/sunny.png" alt="me" class="online" /> 
-                    <span id="cont-nameuser" title="<?php echo Session::get('sys_nombreUsuario')?>">
-                            <?php echo Session::get('sys_nombreUsuario')?> 
-                    </span>
-                    <i class="fa fa-angle-down"></i>
+                <img src="<?php echo $rutaLayout['_img']; ?>avatars/sunny.png" alt="me" class="online" /> 
+                <span id="cont-nameuser" title="<?php echo Session::get('sys_nombreUsuario') ?>">
+                    <?php echo Session::get('sys_nombreUsuario') ?> 
+                </span>
+                <i class="fa fa-angle-down"></i>
             </a> 
 
         </span>
