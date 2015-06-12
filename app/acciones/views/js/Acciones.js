@@ -119,6 +119,7 @@ var Acciones_ = function() {
             tWidthFormat: "px",
             tScrollY: "200px",
             tRegsLength: [3, 25, 50, 100],
+            pOrderField: 'accion asc',
             pDisplayLength: 3,
             sCheckbox: {
                 serverValues: ['alias','estado'],
@@ -142,7 +143,7 @@ var Acciones_ = function() {
                         clientParams:['$("#tab_TAB_CRDACgridAcciones2_cbLength").val()','$("#tab_TAB_CRDACgridAcciones_cbLength").val()']
                     }
                 },
-                {title: lang.Acciones.DISEN, field: "disenio", width: "280", filter:{type:"time"}},
+                {title: lang.Acciones.DISEN, field: "disenio", width: "280", sortable: true, filter:{type:"time"}},
                 {
                     title: lang.Acciones.ALAIS, 
                     field: "alias", 

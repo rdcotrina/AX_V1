@@ -15,6 +15,8 @@
     
     var DATA_SELECT         = [];       /*almacena los datos de un <select> via ajax o cliente*/
     
+    var TH_TMP              = null;     /*para detectar a q columna no se reiniciara los css de sorting*/
+    
     $.fn.extend({
         
         dataGrid: function(opt){
@@ -42,7 +44,7 @@
             
             var _private = {};
             
-            _private.cssTable       = 'table table-striped table-hover table-condensed dataTable table-bordered';
+            _private.cssTable       = 'table table-striped table-hover table-condensed dataTable table-bordered dataGrid';
                     
             _private.positionAxion  = 'last';                           /*posicion de las acciones*/
             
@@ -214,6 +216,11 @@
                 return {a: com1, b: com2, c: op};
             };
             
+            /*
+             * Ejecuta la busqueda mediante los filtros
+             * @param {type} oSettings
+             * @returns {undefined}
+             */
             _private.executeFilter = function(oSettings){
                 var searchTxt = '';
                 $('#' + oSettings.tObjectTable).find('thead').find('tr:eq(1)').find('th').each(function() {
@@ -251,6 +258,11 @@
                 $.method.sendAjax(oSettings);
             };
             
+            /*
+             * Limpia la busqueda, reset
+             * @param {type} oSettings
+             * @returns {undefined}
+             */
             _private.clearFilter = function(oSettings){
                 $('#' + oSettings.tObjectTable).find('thead').find('tr:eq(1)').find('th').each(function() {
                     $(this).find('div').find('input, .filter1, .filter2').val('');
@@ -702,18 +714,6 @@
                     });
                     $('.timepickerGrid').mask('99:99');
                 }
-                
-                if(FIELDS.length){
-                    //$(document).off('click'); -- daba problema con los botones grupales
-                    $(document).click(function(a) {
-                        for(var i in FIELDS){
-                            var filterParent = $(a.target).parent().attr('data-filter');    /*cuando es un date*/
-                            if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent){
-                                $('#cont_filter_'+oSettings.tObjectTable+'_'+FIELDS[i]).css({display: 'none'});
-                            }
-                        }
-                    });
-                }
             };
             
             /*
@@ -785,6 +785,51 @@
             };
             
             /*
+             * Ejecuta la ordenacion por columnas
+             * @param {type} tthis
+             * @param {type} oSettings
+             * @returns {undefined}
+             */
+            _private.executeSorting = function(tthis,oSettings){
+                var thId = $(tthis).attr('id'),
+                    orienta;
+                oSettings.pOrderField = $(tthis).data('order');
+                
+                /*antes de dar efecto se resetea para dar los nuevos css*/
+                if (TH_TMP !== thId) {
+                    /*a todos los <th> del primer <tr> que tengan los css .sorting_asc y .sorting_desc les agreso el css .sorting*/
+                    $('#' + oSettings.tObjectTable).find('thead').find('tr:nth-child(1)').find('.sorting_asc').addClass('sorting');
+                    $('#' + oSettings.tObjectTable).find('thead').find('tr:nth-child(1)').find('.sorting_desc').addClass('sorting');
+                    
+                    /*a todos los <th> del primer <tr> les remuevo los css .sorting_asc y .sorting_desc*/
+                    $('#' + oSettings.tObjectTable).find('thead').find('tr:nth-child(1)').find('th').removeClass('sorting_asc');
+                    $('#' + oSettings.tObjectTable).find('thead').find('tr:nth-child(1)').find('th').removeClass('sorting_desc');
+                    
+                }
+            
+                if ($('#' + thId).is('.sorting')) {                /*ordenacion ascendente*/
+                    $('#' + thId).removeClass('sorting');
+                    $('#' + thId).addClass('sorting_asc');
+                    orienta = ' ASC';
+                } else if ($('#' + thId).is('.sorting_asc')) {      /*ordenacion ascendente*/
+                    $('#' + thId).removeClass('sorting_asc');
+                    $('#' + thId).addClass('sorting_desc');
+                    orienta = ' DESC';
+                } else if ($('#' + thId).is('.sorting_desc')) {     /*sin ordenacion*/
+                    $('#' + thId).removeClass('sorting_desc');
+                    $('#' + thId).addClass('sorting');
+                    orienta = ' ';
+                } 
+                
+                TH_TMP = thId;
+                        
+                oSettings.pOrderField += orienta;
+                oSettings.pDisplayLength = $('#' + oSettings.tObjectTable + '_cbLength').val();  /*tomo el valor del combo para los registros a mostrar*/
+                oSettings.pDisplayStart = parseInt($('#paginate_' + oSettings.tObjectTable).find('ul.pagination').find('li.active').find('a').html()) - 1;
+                $.method.sendAjax(oSettings);
+            };
+            
+            /*
              * Crea la cabecera de la tabla
              * @param {type} oSettings
              * @returns {undefined}
@@ -831,7 +876,23 @@
                     th.attr('class', 'center');        /*agregado class css*/
                     th.css({width: width, 'vertical-align': 'middle'});                                          /*agregando width de columna*/
                     th.append(title);                                                 /*se agrega el titulo*/
-
+                    th.attr('data-order',field);
+                    
+                    /*agregando css para sortable*/
+                    if(sortable !== ''){
+                        th.addClass(sortable);
+                        th.data(field);
+                        th.click(function(){
+                            _private.executeSorting(this,oSettings);
+                        });
+                    }
+                    /*verificar si se inicio ordenamiento y agegar class a th*/
+                    var cad = oSettings.pOrderField.split(' ');
+                    if (cad[0] === field) {
+                        th.removeClass(sortable);
+                        th.addClass('sorting_' + cad[1])
+                    }
+                    
                     if(search instanceof Object){    /*se verifica si existe busquedas por columnas*/
                         _private.ifSearch = true;
                     }
@@ -1120,7 +1181,6 @@
                     var pagInicio = (paginaActual - itemPag);
                     var pagInicio = (pagInicio <= 0 ? 1 : pagInicio);
                     var pagFinal  = (pagInicio + (oSettings.pItemPaginas - 1));
-                    var click     = '';
                     var trIni     = ((paginaActual * length) - length) + 1;
                     var trFin     = (paginaActual * length);
                     
@@ -1557,6 +1617,33 @@
             };
             
             /*
+             * Cebra de columna al ordenar
+             * @param {type} r
+             * @param {type} pOrderField
+             * @param {type} campo
+             * @returns {String}
+             */
+            _private.cebraCol = function(r, oSettings, campo) {
+                var m, classort;
+                m = oSettings.pOrderField.split(' ');
+                classort = '';
+                
+                var cssTh = $('#'+oSettings.tObjectTable+'_head_th_'+r).is('.sorting');
+                
+                if (campo === m[0]) {
+                    classort = ' sorting_1';
+                    if (r % 2) {
+                        classort = ' sorting_2';
+                    }
+                }
+                /*si tiene .soting no se envia css*/
+                if(cssTh){
+                    classort = '';
+                }
+                return classort;
+            };
+            
+            /*
              * Crea los registros de la tabla
              * @param {type} oSettings
              * @returns {undefined}
@@ -1641,6 +1728,12 @@
                             }
                             td.html(texto);                         /*contenido original de <td>*/
                             td.attr('class', klass);                /*agregado class css*/
+                            
+                            /*verificar si se ordena para marcar*/
+                            var classort = _private.cebraCol(r, oSettings, oSettings.tColumns[c].field);
+                            
+                            td.addClass(classort);
+                            
                             td.attr({width:width});
                             /*verificar si tiene fnCallback configurado*/
                             if(fnCallback !== undefined && fnCallback instanceof Object){
@@ -1732,6 +1825,18 @@
                         /*se valida se data sera via ajax*/
                         if (oSettings.ajaxSource) {
                             this.sendAjax(oSettings);
+                        }
+                        
+                        /*para ocultar filtros avanzados al dar click en document*/
+                        if(FIELDS.length){
+                            $(document).click(function(a) {
+                                for(var i in FIELDS){
+                                    var filterParent = $(a.target).parent().attr('data-filter');    /*cuando es un date*/
+                                    if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent){
+                                        $('#cont_filter_'+oSettings.tObjectTable+'_'+FIELDS[i]).css({display: 'none'});
+                                    }
+                                }
+                            });
                         }
                     },
                     

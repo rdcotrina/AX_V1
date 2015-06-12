@@ -334,3 +334,9 @@ em.invalid:before{
 .mr5{
     margin-right: 5px;
 }
+table.dataGrid tr td.sorting_1 {
+  background-color: #F2F2F2 !important;
+}
+table.dataGrid tr td.sorting_2 {
+  background-color: #E6E6E6 !important;
+}
