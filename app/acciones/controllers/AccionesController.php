@@ -27,7 +27,18 @@ class AccionesController extends Controller{
         }  catch (Exception $e){
             self::$Auditoria->logErrors($e);
         }
-        
+    }
+    
+    public function getAlias(){
+        try{
+            $data =  self::$AccionesModel->getAlias();
+            
+            $res = array('dataServer'=>$data, 'field'=> SimpleForm::getPost('_field'));
+            
+            echo json_encode($res);
+        }  catch (Exception $e){
+            self::$Auditoria->logErrors($e);
+        }
     }
     
 }

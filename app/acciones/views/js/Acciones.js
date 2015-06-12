@@ -60,10 +60,10 @@ var Acciones_ = function() {
             tRegsLength: [3, 25, 50, 100],
             pDisplayLength: 3,
             tColumns: [
-                {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,search: {operator:"LIKE"}},
-                {title: lang.Acciones.DISEN, field: "disenio", width: "220", search:{operator:"LIKE"}},
-                {title: lang.Acciones.ALAIS, field: "alias", width: "220", sortable: true,search:{operator:"LIKE"}},
-                {title: lang.generic.EST, field: "estado", width: "220", sortable: true, class: "center",search:{operator:"LIKE"}}
+                {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,filter: {operator:"LIKE"}},
+                {title: lang.Acciones.DISEN, field: "disenio", width: "220", filter:{operator:"LIKE"}},
+                {title: lang.Acciones.ALAIS, field: "alias", width: "220", sortable: true,filter:{operator:"LIKE"}},
+                {title: lang.generic.EST, field: "estado", width: "220", sortable: true, class: "center",filter:{operator:"LIKE"}}
             ],
             pPaginate: true,
             sAxions: {
@@ -129,7 +129,12 @@ var Acciones_ = function() {
                 ]
             },
             tColumns: [
-                {title: lang.Acciones.AXION,field: "accion",width: "330",sortable: true,search: {type:"date"},
+                {
+                    title: lang.Acciones.AXION,
+                    field: "accion",
+                    width: "330",
+                    sortable: true,
+                    filter: {type:"date"},
                     ajax:{
                         flag: 11,
                         fn: 'Acciones.lafuncionjs',
@@ -137,8 +142,18 @@ var Acciones_ = function() {
                         clientParams:['$("#tab_TAB_CRDACgridAcciones2_cbLength").val()','$("#tab_TAB_CRDACgridAcciones_cbLength").val()']
                     }
                 },
-                {title: lang.Acciones.DISEN, field: "disenio", width: "280", search:{type:"time"}},
-                {title: lang.Acciones.ALAIS, field: "alias", width: "250", sortable: true,search:{type:"select"},
+                {title: lang.Acciones.DISEN, field: "disenio", width: "280", filter:{type:"time"}},
+                {
+                    title: lang.Acciones.ALAIS, 
+                    field: "alias", 
+                    width: "250", 
+                    sortable: true,
+                    filter:{
+                        type:"select",
+                        ajaxData: _private.config.modulo+'getAlias',
+//                        dataClient:[{etiqueta:'ED',value:'ED'},{etiqueta:'DE',value:'DE'}],
+                        options:{label:'alias',value:'alias'}
+                    },
                     fnCallback:function(fila,row){
                         if(row.alias == 'GR'){
                             return 'modificado_'+fila;
@@ -147,7 +162,7 @@ var Acciones_ = function() {
                         }
                     }
                 },
-                {title: lang.generic.EST, field: "estado", width: "250", sortable: true, class: "center",search:{type:"text"}}
+                {title: lang.generic.EST, field: "estado", width: "250", sortable: true, class: "center",filter:{type:"text"}}
             ],
             pPaginate: true,
             sAxions: {

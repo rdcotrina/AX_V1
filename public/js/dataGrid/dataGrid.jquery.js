@@ -9,7 +9,11 @@
     
     "use strict";
     
-    var COUNT_EXE_SCROLL = [];      /*almacena cuantas veces se ejecuta el srcoll por cada grid*/
+    var COUNT_EXE_SCROLL    = [];       /*almacena cuantas veces se ejecuta el srcoll por cada grid*/
+    
+    var FIELDS              = [];       /*almacena los campos, para ocultar los filtros de cada columna*/
+    
+    var DATA_SELECT         = [];       /*almacena los datos de un <select> via ajax o cliente*/
     
     $.fn.extend({
         
@@ -40,8 +44,6 @@
             
             _private.cssTable       = 'table table-striped table-hover table-condensed dataTable table-bordered';
                     
-            _private.pFilterCols    = '';                               /*sql generado mediante filtros avanzados*/
-            
             _private.positionAxion  = 'last';                           /*posicion de las acciones*/
             
             _private.btnFirst       = 'fa fa-fast-backward';
@@ -64,7 +66,7 @@
             
             _private.ifDatePicker   = false;
             
-            _private.ifTimePicker  = false;
+            _private.ifTimePicker   = false;
             
             /*
              * Rretorna info sobre cantidad de registros
@@ -192,11 +194,534 @@
             };
             
             /*
-             * Crea controles para busqueda por columnas
+             * Obtener el operador
+             * @param {type} o
+             * @returns {dataGrid.jquery_L8.dataGrid.jqueryAnonym$0.dataGrid._private.operator.dataGrid.jqueryAnonym$7}
+             */
+            _private.operator = function(o) {
+                var com1 = '', com2 = '', op = o;
+                /*si operator es LIKE se agrea comodin % */
+                if (o.toLowerCase() === 'like') {
+                    com1 = '*';  /*este sera el comodin*/
+                    com2 = '*';  /*este sera el comodin*/
+                } else if (o.toLowerCase() === 'c') {/*compienza por*/
+                    op = 'LIKE';
+                    com2 = '*';  /*este sera el comodin*/
+                } else if (o.toLowerCase() === 't') {/*termina por*/
+                    op = 'LIKE';
+                    com1 = '*';  /*este sera el comodin*/
+                }
+                return {a: com1, b: com2, c: op};
+            };
+            
+            _private.executeFilter = function(oSettings){
+                var searchTxt = '';
+                $('#' + oSettings.tObjectTable).find('thead').find('tr:eq(1)').find('th').each(function() {
+                    var filter1 = $(this).find('div:eq(0)').find('input, select');
+                    var field = filter1.attr('field');
+                    
+                    if(field !== undefined){
+                        var div2 = $(this).find('#cont_filter_'+oSettings.tObjectTable+'_'+field);
+                        
+                        var operator1 = div2.find('.operador1').val();
+                        var operator2 = div2.find('.operador2').val();
+                        var operator3 = div2.find('.operador3').val();
+                        var filter2   = div2.find('.filter2').val();
+                        var campo = field;
+                       
+                        /* = <> > >= < <= C T LIKE */
+                        /*valor de primer filtro tiene contenido*/
+                        if (filter1.val() !== '') {
+                            var oA = _private.operator(operator1);
+                            /*verificar si hay AND o OR*/
+                            if (filter2 !== '') {
+                                var oB = _private.operator(operator3);
+
+                                searchTxt += ' AND (' + campo + ' ' + oA.c + ' "' + oA.a + filter1.val() + oA.b + '" ' + operator2 + ' ' + campo + ' ' + oB.c + ' "' + oB.a + filter2 + oB.b + '")';
+                            } else {
+                                searchTxt += ' AND ' + campo + ' ' + oA.c + ' "' + oA.a + filter1.val() + oA.b + '"';
+                            }
+                        }
+                    }
+                    $(this).find('.main-filter').css({display: 'none'});
+                });
+             
+                oSettings.pFilterCols = searchTxt;
+                oSettings.pDisplayStart = 0;
+                $.method.sendAjax(oSettings);
+            };
+            
+            _private.clearFilter = function(oSettings){
+                $('#' + oSettings.tObjectTable).find('thead').find('tr:eq(1)').find('th').each(function() {
+                    $(this).find('div').find('input, .filter1, .filter2').val('');
+                    $(this).find('.main-filter').css({display: 'none'});
+                });
+                
+                oSettings.pFilterCols = '';
+                oSettings.pDisplayStart = 0;
+                $.method.sendAjax(oSettings);
+            };
+            
+            /*
+             * Crea los filtros y condiciones q se visualizaran al pulsar el icono: FILTRO
+             * @param {type} field
+             * @param {type} oSettings
+             * @param {type} tipo
+             * @returns {undefined}
+             */
+            _private.addFilters = function(field,oSettings,tipo){
+                var idCont = 'cont_filter_'+oSettings.tObjectTable+'_'+field;
+                var divF = $('<div></div>');
+                divF.attr('data-filter',field);
+                divF.attr('class','well well-sm main-filter');
+                divF.css({
+                    'display': 'none',
+                    'position': 'absolute',
+                    'right': '6px',
+                    'z-index':5
+                });
+                divF.attr('id',idCont);
+                
+                /*agregar texto 1*/
+                var txt1 = $('<p></p>');
+                txt1.attr('data-filter',field);
+                txt1.html('Mostrar&nbsp;registros&nbsp;que&nbsp;sean:');
+                
+                divF.append(txt1);
+                
+                /*agregar primer <select> de operadores 1*/
+                var operator1 = $('<select></select>');
+                operator1.attr('id','op1_'+oSettings.tObjectTable+'_'+field);
+                operator1.attr('data-filter',field);
+                operator1.attr('class','form-control operador1');
+                operator1.html('<option value="=">Igual</option>\n\
+                                <option value="!=">Diferente</option>\n\
+                                <option value=">">Mayor</option>\n\
+                                <option value=">=">Mayor o igual</option>\n\
+                                <option value="<">Menor</option>\n\
+                                <option value="<=">Menor o igual</option>\n\
+                                <option value="C">Comienza</option>\n\
+                                <option value="T">Termina</option>\n\
+                                <option value="LIKE">Contiene</option>');
+                operator1.find('option').attr('data-filter',field);
+                divF.append(operator1);
+                
+                /*combo con operadores 2 AND, OR*/
+                var operator2 = $('<select></select>');
+                operator2.attr('id','op2_'+oSettings.tObjectTable+'_'+field);
+                operator2.attr('data-filter',field);
+                operator2.attr('class', 'form-control operador2');
+                operator2.css({'margin-top': '5px', 'margin-bottom': '5px', width: '80px'});
+                operator2.html('<option value="AND">AND</option>\n\
+                                <option value="OR">OR</option>');
+                operator2.find('option').attr('data-filter',field);
+                divF.append(operator2);
+                
+                /*agregar primer <select> de operadores 3*/
+                var operator3 = $('<select></select>');
+                operator3.attr('id','op3_'+oSettings.tObjectTable+'_'+field);
+                operator3.attr('data-filter',field);
+                operator3.attr('class','form-control operador3');
+                operator3.css({'margin-bottom':'5px'});
+                operator3.html('<option value="=">Igual</option>\n\
+                                <option value="<>">Diferente</option>\n\
+                                <option value=">">Mayor</option>\n\
+                                <option value=">=">Mayor o igual</option>\n\
+                                <option value="<">Menor</option>\n\
+                                <option value="<=">Menor o igual</option>\n\
+                                <option value="C">Comienza</option>\n\
+                                <option value="T">Termina</option>\n\
+                                <option value="LIKE">Contiene</option>');
+                operator3.find('option').attr('data-filter',field);
+                divF.append(operator3);
+                
+                
+                /*agregando filtro dos*/
+                var filter2 = null, cont, icon; 
+                
+                switch (tipo.toLowerCase()) {
+                    case 'text':                            /*se crea input:text*/
+                        filter2 = $('<input></input>');
+                        filter2.attr('type','text');
+                        filter2.addClass('form-control filter2');
+
+                        break;
+                    case 'date':                            /*se crea input:text, con datepicker*/
+                        filter2 = $('<input></input>');
+                        filter2.addClass('datepickerGrid');
+                        filter2.attr('type','text');
+                        filter2.addClass('form-control filter2');
+
+                        icon = $('<label></label>');
+                        icon.attr('for',field);
+                        icon.attr('data-filter',field);
+                        icon.attr('class','glyphicon glyphicon-calendar');
+
+                        cont = $('<div></div>');
+                        cont.addClass('icon-addon addon-md');                      /*para los iconos*/
+                        cont.attr('data-filter',field);
+                        cont.html(filter2);
+                        cont.append(icon);
+
+                        filter2 = cont;
+                        break;
+                    case 'time':                        /*se crea input:text, con clockpicker*/
+                        filter2 = $('<input></input>');
+                        filter2.addClass('timepickerGrid');
+                        filter2.attr('data-filter',field);
+                        filter2.attr('type','text');
+                        filter2.addClass('form-control filter2');
+
+                        icon = $('<label></label>');
+                        icon.attr('for',field);
+                        icon.attr('data-filter',field);
+                        icon.attr('class','glyphicon glyphicon-time');
+
+                        cont = $('<div></div>');
+                        cont.addClass('icon-addon addon-md');                      /*para los iconos*/
+                        cont.attr('data-filter',field);
+                        cont.html(filter2);
+                        cont.append(icon);
+
+                        filter2 = cont;
+                        break;
+                    case 'select': 
+                        filter2 = $('<select></select>');
+
+                        /*options*/
+                        var opt = $('<option></option>');
+                        opt.attr('value', '');
+                        opt.html('Seleccionar...');
+
+                        filter2.append(opt);
+                        filter2.addClass('form-control filter2');
+
+                        var dataClient = '';
+                        for(var t in DATA_SELECT){
+                            for(var g in DATA_SELECT[t]){
+                                if(oSettings.tObjectTable+'_'+field === g){
+                                    dataClient = DATA_SELECT[t][g];
+                                }
+                            }
+                        }
+
+                        filter2.append(dataClient);
+                        break;
+                }
+                filter2.attr('id','f2_'+oSettings.tObjectTable+'_'+field);
+                filter2.attr('data-filter',field);
+                
+                divF.append(filter2);
+                
+                /*botones filtrar y cerrar*/
+                var cntBtn = $('<div></div>');
+                cntBtn.attr('data-filter',field);
+                cntBtn.css({'margin-top': '5px'});
+                
+                var btnFilter = $('<button></button>');
+                btnFilter.attr('type','button');
+                btnFilter.attr('class','btn btn-default');
+                btnFilter.attr('data-filter',field);
+                btnFilter.css({float: 'left'});
+                btnFilter.html('<i class="fa fa-search"></i> Filtrar');
+                btnFilter.click(function(){
+                    _private.executeFilter(oSettings);
+                });
+                
+                cntBtn.append(btnFilter);
+                
+                var btnClose = $('<button></button>');
+                btnClose.attr('type','button');
+                btnClose.attr('class','btn btn-default');
+                btnClose.attr('data-filter',field);
+                btnClose.css({float: 'right'});
+                btnClose.html('<i class="fa fa-trash-o"></i> Limpiar');
+                btnClose.click(function(){
+                    $("#"+idCont).css({display:"none"});
+                    _private.clearFilter(oSettings);
+                });
+                
+                cntBtn.append(btnClose);
+                
+                divF.append(cntBtn);
+                
+                $('#th_cont_search_'+oSettings.tObjectTable+'_'+field).append(divF);
+            };
+            
+            /*
+             * Crea icono filtro en cada <th>
+             * @param {type} idTH   --  id del <th> de cada filtro en el <thead>
+             * @returns {undefined}
+             */
+            _private.addIconFilter = function(field,oSettings,tipo){
+                var sp = $('<span></span>');
+                sp.attr('class','input-group-addon');
+                sp.attr('data-filter',field);
+                sp.attr('onclick','$("#cont_filter_' + oSettings.tObjectTable + '_' + field + '").toggle();');
+                
+                var ii = $('<i></i>');
+                ii.attr('data-filter',field);
+                ii.css({cursor: 'pointer'});
+                ii.attr('class','glyphicon glyphicon-filter');
+                
+                sp.html(ii);
+                $('#th_cont_search_'+oSettings.tObjectTable+'_'+field).find('div:eq(0)').append(sp);
+                
+                /*insertar capa con condicionales*/
+                _private.addFilters(field,oSettings,tipo);
+            };
+            
+            /*
+             * Crea los elementos para los filtros
+             * @param {type} oSettings
+             * @returns {undefined}
+             */
+            _private.addSearchCols = function(oSettings){
+                /*recorrido de columnas, creando los filtros*/
+                for (var c in oSettings.tColumns) {
+                    var elementSearch = null;                          /*el filtro*/
+                    var cont,idTH;
+                    var kfield = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '';
+                    var search = (oSettings.tColumns[c].filter !== undefined) ? oSettings.tColumns[c].filter : false;   /*para activar busqueda de columnas*/
+                    
+                    /*verificar si se configuro la busqueda*/
+                    if (search instanceof Object && search !== false) {
+                        var tipo    = (search.type !== undefined) ? search.type : 'text';                  /*tipo de elemento*/
+                        var field   = (search.compare !== undefined) ? search.compare : kfield;            /*el campo q se buscara, en caso oSettings.tColumns[c].campo no sea util*/
+                        var idField = 'input_search_'+oSettings.tObjectTable+'_'+field;
+                        var icon    = null;           /*para el icono del field*/
+                        
+                        FIELDS.push(field);                          /*para ocultar filtros al dar click en document*/
+                        
+                        /*id del <th>*/
+                        idTH    = 'th_cont_search_'+oSettings.tObjectTable+'_'+field;
+                        
+                        /*switch segun type de objeto*/
+                        switch (tipo.toLowerCase()) {
+                            case 'text':                            /*se crea input:text*/
+                                elementSearch = $('<input></input>');
+                                elementSearch.attr('type','text');
+                                elementSearch.attr('id','f1_'+oSettings.tObjectTable+'_'+field);
+                                elementSearch.addClass('form-control filter1');
+                                elementSearch.attr('field',field);
+                                elementSearch.keyup(function(tecla) {
+                                    if (tecla.keyCode === 13) {
+                                        _private.executeFilter(oSettings);
+                                    }
+                                });
+
+                                cont = $('<label></label>');
+                                cont.css({display: 'block'});       /*para que ocupe todo el <th>*/
+                                cont.html(elementSearch);
+                                
+                                
+                                $('#'+idTH).find('div').html(cont);
+                                
+                                /*agregando el operador*/
+                                _private.addIconFilter(field,oSettings,tipo);
+                                break;
+                            case 'date':                            /*se crea input:text, con datepicker*/
+                                _private.ifDatePicker = true;
+
+                                elementSearch = $('<input></input>');
+                                elementSearch.addClass('datepickerGrid');
+                                elementSearch.attr('type','text');
+                                elementSearch.attr('id','f1_'+oSettings.tObjectTable+'_'+field);
+                                elementSearch.addClass('form-control filter1');
+                                elementSearch.attr('field',field);
+                                elementSearch.keyup(function(tecla) {
+                                    if (tecla.keyCode === 13) {
+                                        _private.executeFilter(oSettings);
+                                    }
+                                });
+                                elementSearch.change(function(tecla) {
+                                    _private.executeFilter(oSettings);
+                                });
+                                
+                                icon = $('<label></label>');
+                                icon.attr('for',idField);
+                                icon.attr('class','glyphicon glyphicon-calendar');
+
+                                cont = $('<div></div>');
+                                cont.addClass('icon-addon addon-md');                      /*para los iconos*/
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                
+                                $('#'+idTH).find('div').html(cont);
+                                
+                                /*agregando el operador*/
+                                _private.addIconFilter(field,oSettings,tipo);
+                                break;
+                            case 'time':                        /*se crea input:text, con clockpicker*/
+                                _private.ifTimePicker = true;
+
+                                elementSearch = $('<input></input>');
+                                elementSearch.addClass('timepickerGrid');
+                                elementSearch.attr('type','text');
+                                elementSearch.attr('id','f1_'+oSettings.tObjectTable+'_'+field);
+                                elementSearch.addClass('form-control filter1');
+                                elementSearch.attr('field',field);
+                                elementSearch.keyup(function(tecla) {
+                                    if (tecla.keyCode === 13) {
+                                        _private.executeFilter(oSettings);
+                                    }
+                                });
+                                elementSearch.change(function() {
+                                    _private.executeFilter(oSettings);
+                                });
+                                
+                                icon = $('<label></label>');
+                                icon.attr('for',idField);
+                                icon.attr('class','glyphicon glyphicon-time');
+
+                                cont = $('<div></div>');
+                                cont.addClass('icon-addon addon-md');                      /*para los iconos*/
+                                cont.html(elementSearch);
+                                cont.append(icon);
+                                
+                                $('#'+idTH).find('div').html(cont);
+                                
+                                /*agregando el operador*/
+                                _private.addIconFilter(field,oSettings,tipo);
+                                break;
+                            case 'select':                      /*se crea <select>*/
+                                var url         = (search.ajaxData !== undefined) ? search.ajaxData : null; /*para data de combo*/
+                                var options     = (search.options !== undefined) ? search.options : [];          /*campos para select*/
+                                var dataClient  = (search.dataClient !== undefined) ? search.dataClient : [];          /*data desde el cliente*/
+                                var flag        = (search.flag !== undefined) ? search.flag : '';
+
+                                if(options.length === 0){
+                                    alert('[options] No definido, defina [options].')
+                                }
+                                
+                                if(url !== null){                    /*datos desde el servidor*/
+                                    var data_s;
+                                    var promise = $.ajax({
+                                                    type: "POST",
+                                                    url: url,
+                                                    dataType: 'json',
+                                                    data:{_flag: flag, _field: field},       /*se envia configuracion de <select> porq la llamada es multiple*/
+                                                    success: function(resp) {
+                                                        data_s = resp;
+                                                    }
+                                                });
+                                    /*promesa se ejecuta a la respuesta del server*/
+                                    promise.done(function(){
+                                        elementSearch = $('<select></select>');
+                                        elementSearch.attr('id','f1_'+oSettings.tObjectTable+'_'+data_s.field);
+                                        elementSearch.addClass('form-control filter1');
+                                        elementSearch.attr('field',data_s.field);
+                                        elementSearch.change(function() {
+                                            _private.executeFilter(oSettings);
+                                        });
+                                
+                                        /*options*/
+                                        var opt = $('<option></option>');
+                                        opt.attr('value', '');
+                                        opt.html('Todos...');
+
+                                        elementSearch.append(opt);
+                                        
+                                        var oopp = '';
+                                        for (var x in data_s.dataServer) {
+                                            oopp += '<option value="'+data_s.dataServer[x][options.value]+'">'+data_s.dataServer[x][options.label]+'</option>';
+                                        }
+                                        
+                                        elementSearch.append(oopp);
+                                        
+                                        cont = $('<label></label>');
+                                        cont.css({display: 'block'});       /*para que ocupe todo el <th>*/
+                                        cont.html(elementSearch);
+
+                                        /*data retorna del server, se debe insertar en <th> con html()*/
+                                        $('#th_cont_search_'+oSettings.tObjectTable+'_'+data_s.field).find('div').html(cont);
+                                        
+                                        /*guardando data para el filtro 2*/
+                                        var indice = oSettings.tObjectTable+'_'+data_s.field;
+                                        eval('DATA_SELECT.push({'+indice+': \''+oopp+'\'});');
+                                        
+                                        /*agregando el operador*/
+                                        _private.addIconFilter(data_s.field,oSettings,'select');
+                                    });
+                                }else if(dataClient.length > 0 && dataClient instanceof Object){    /*datos desde el cliente*/
+                                    cont = $('<label></label>');
+                                    cont.css({display: 'block'});       /*para que ocupe todo el <th>*/
+
+                                    elementSearch = $('<select></select>');
+
+                                    /*options*/
+                                    var opt = $('<option></option>');
+                                    opt.attr('value', '');
+                                    opt.html('Todos...');
+
+                                    elementSearch.append(opt);
+                                    elementSearch.attr('id','f1_'+oSettings.tObjectTable+'_'+field);
+                                    elementSearch.addClass('form-control filter1');
+                                    elementSearch.attr('field',field);
+                                    elementSearch.change(function() {
+                                        _private.executeFilter(oSettings);
+                                    });
+                                        
+                                    var oopp = '';
+                                    for (var x in dataClient) {
+                                        oopp += '<option value="'+dataClient[x].value+'">'+dataClient[x].etiqueta+'</option>';
+                                    }
+                                    elementSearch.append(oopp);
+
+                                    cont.html(elementSearch);
+                                    $('#'+idTH).find('div').html(cont);
+                                    
+                                    /*guardando data para el filtro 2*/
+                                    var indice = oSettings.tObjectTable+'_'+field;
+                                    eval('DATA_SELECT.push({'+indice+': \''+oopp+'\'});');
+                                        
+                                    /*agregando el operador*/
+                                    _private.addIconFilter(field,oSettings,tipo);
+                                }
+                                break;
+                        }
+                    }
+                }
+                
+                /*verificar si se aplica datepicker*/
+                if(_private.ifDatePicker){
+                    $('.datepickerGrid').datepicker({
+                        prevText: '<i class="fa fa-chevron-left"></i>',
+                        nextText: '<i class="fa fa-chevron-right"></i>',
+                        changeMonth: true,
+                        changeYear: true,
+                        dateFormat: 'dd-mm-yy'
+                    });
+                    $('.datepickerGrid').mask('99-99-9999');
+                }
+
+                /*verificar si se aplica clockpicker*/
+                if(_private.ifTimePicker){
+                    $('.timepickerGrid').clockpicker({
+                        autoclose: true
+                    });
+                    $('.timepickerGrid').mask('99:99');
+                }
+                
+                if(FIELDS.length){
+                    //$(document).off('click'); -- daba problema con los botones grupales
+                    $(document).click(function(a) {
+                        for(var i in FIELDS){
+                            var filterParent = $(a.target).parent().attr('data-filter');    /*cuando es un date*/
+                            if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent){
+                                $('#cont_filter_'+oSettings.tObjectTable+'_'+FIELDS[i]).css({display: 'none'});
+                            }
+                        }
+                    });
+                }
+            };
+            
+            /*
+             * Crea <tr> para busqueda por columnas
              * @param {type} oSettings
              * @returns {$}
              */
-            _private.addSearchCols = function(oSettings){
+            _private.addTrSearchCols = function(oSettings){
                 var tr = $('<tr></tr>'),
                     chkExist = 0;
                 
@@ -216,92 +741,28 @@
                 if(oSettings.sCheckbox !== undefined && oSettings.sCheckbox instanceof Object){
                     var pos = (oSettings.sCheckbox.position !== undefined) ? oSettings.sCheckbox.position : 'first';
                     if(pos.toLowerCase() === 'first'){                        
-                        var th = $('<th></th>');                  
+                        var th = $('<th></th>');                            
                         tr.append(th);                          /*se agrega al <tr>*/                       
                         chkExist = 1;
                     }
                 }   
                 
-                /*recorrido de columnas, creando los filtros*/
+                /*recorrido de columnas, creando <tr> para filtros*/
                 for (var c in oSettings.tColumns) {
-                    var elementSearch = null;                          /*el filtro*/
-                    var cont;
                     var kfield = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '';
-                    var search = (oSettings.tColumns[c].search !== undefined) ? oSettings.tColumns[c].search : false;   /*para activar busqueda de columnas*/
-                    
+                    var search = (oSettings.tColumns[c].filter !== undefined) ? oSettings.tColumns[c].filter : false;   /*para activar busqueda de columnas*/
+                    var field   = (search.compare !== undefined) ? search.compare : kfield;            /*el campo q se buscara, en caso oSettings.tColumns[c].campo no sea util*/
+                    var idTH    = 'th_cont_search_'+oSettings.tObjectTable+'_'+field;
+
+                    var th = $('<th></th>');                    /*se crea la columna*/
+                    th.attr('id',idTH);
+                    th.css({position: 'relative'});
                     th.addClass('hasinput');
+                        
+                    var divg = $('<div></div>');
+                    divg.attr('class','input-group input-group-md');                    
                     
-                   /*verificar si se configuro la busqueda*/
-                   if (search instanceof Object && search !== false) {
-                        var th = $('<th></th>');                    /*se crea la columna*/
-                        var tipo    = (search.type !== undefined) ? search.type : 'text';                  /*tipo de elemento*/
-                        var field   = (search.compare !== undefined) ? search.compare : kfield;            /*el campo q se buscara, en caso oSettings.tColumns[c].campo no sea util*/
-                        var idField = 'input_search_'+oSettings.tObjectTable+'_'+field;
-                        var icon = null;           /*para el icono del field*/
-                        
-                        /*switch segun type de objeto*/
-                        switch (tipo.toLowerCase()) {
-                            case 'text':
-                                elementSearch = $('<input></input>');
-                                elementSearch.attr('type','text');
-                                
-                                cont = $('<label></label>');
-                                cont.html(elementSearch);
-                                cont.append(icon);
-                                break;
-                            case 'select':
-                                elementSearch = $('<select></select>');
-                                
-                                cont = $('<label></label>');
-                                cont.html(elementSearch);
-                                cont.append(icon);
-                                break;
-                            case 'date':
-                                _private.ifDatePicker = true;
-                                
-                                elementSearch = $('<input></input>');
-                                elementSearch.addClass('datepickerGrid');
-                                elementSearch.attr('type','text');
-                               
-                                icon = $('<label></label>');
-                                icon.attr('for',idField);
-                                icon.attr('class','glyphicon glyphicon-calendar');
-                                
-                                cont = $('<label></label>');
-                                cont.html(elementSearch);
-                                cont.append(icon);
-                                
-                                break;
-                            case 'time':
-                                _private.ifTimePicker = true;
-                                
-                                elementSearch = $('<input></input>');
-                                elementSearch.addClass('timepickerGrid');
-                                elementSearch.attr('type','text');
-                                
-                                icon = $('<label></label>');
-                                icon.attr('for',idField);
-                                icon.attr('class','glyphicon glyphicon-time');
-                                
-                                cont = $('<label></label>');
-                                cont.html(elementSearch);
-                                cont.append(icon);
-                                break;
-                        }
-                        
-                        elementSearch.attr('id',idField);
-                        elementSearch.addClass('form-control');
-                        elementSearch.attr('field',field);
-                        
-                        cont.addClass('icon-addon');                      /*para los iconos*/
-                        
-                        th.html(cont);
-                        
-                   }else{ /*no se activo search*/
-                       
-                   }
-                    
-                    
+                    th.html(divg);
                     tr.append(th);                              /*se agrega al <tr>*/ 
                 }
                 
@@ -364,7 +825,7 @@
                     var field   = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '';
                     var sortable= (oSettings.tColumns[c].sortable !== undefined) ? ' sorting' : '';
                     var width   = (oSettings.tColumns[c].width !== undefined) ? oSettings.tColumns[c].width + oSettings.tWidthFormat : '';
-                    var search  = (oSettings.tColumns[c].search !== undefined) ? oSettings.tColumns[c].search : false;   /*para activar busqueda de columnas*/
+                    var search  = (oSettings.tColumns[c].filter !== undefined) ? oSettings.tColumns[c].filter : false;   /*para activar busqueda de columnas*/
                    
                     th.attr('id', oSettings.tObjectTable + '_head_th_' + c);
                     th.attr('class', 'center');        /*agregado class css*/
@@ -397,10 +858,15 @@
               
                 /*agregando controles para busqueda por columna*/ 
                 if(_private.ifSearch){
-                    h.append(_private.addSearchCols(oSettings));      /*se agrega <tr> de busquedas al <thead>*/ 
+                    h.append(_private.addTrSearchCols(oSettings));      /*se agrega <tr> de busquedas al <thead>*/ 
                 }
                 
                 $('#' + oSettings.tObjectTable).append(h);          /*se agrega <thead> al <table>*/
+                
+                /*agregando filtros a <tr>*/
+                if(_private.ifSearch){
+                    _private.addSearchCols(oSettings);      /*se agrega elementos de busquedas al <tr>*/ 
+                }
             };
             
             /*
@@ -636,6 +1102,8 @@
              * @returns {undefined}
              */
             _private.paginate = function(oSettings){
+                if(oSettings.sData.length === 0){ return false; }
+                
                 var total  = oSettings.sData[0].total;
                 var start  = oSettings.pDisplayStart;
                 var length = oSettings.pDisplayLength;
@@ -1265,26 +1733,6 @@
                         if (oSettings.ajaxSource) {
                             this.sendAjax(oSettings);
                         }
-                        
-                        /*verificar si se aplica datepicker*/
-                        if(_private.ifTimePicker){
-                            $('.datepickerGrid').datepicker({
-                                prevText: '<i class="fa fa-chevron-left"></i>',
-                                nextText: '<i class="fa fa-chevron-right"></i>',
-                                changeMonth: true,
-                                changeYear: true,
-                                dateFormat: 'dd-mm-yy'
-                            });
-                            $('.datepickerGrid').mask('99-99-9999');
-                        }
-                        
-                        /*verificar si se aplica clockpicker*/
-                        if(_private.ifTimePicker){
-                            $('.timepickerGrid').clockpicker({
-                                autoclose: true
-                            });
-                            $('.timepickerGrid').mask('99:99');
-                        }
                     },
                     
                     /*
@@ -1299,12 +1747,14 @@
                         /*Verificamos si se enviara parametros al server*/
                         if(oSettings.fnServerParams !== undefined){ oSettings.fnServerParams(_private.aData); }
                         
+                        var filters = (oSettings.pFilterCols !== undefined)?axAjax.stringPost(oSettings.pFilterCols):'';
+                        
                         /*Enviamos datos de paginacion*/
                         _private.aData.push({name: 'pDisplayStart', value: limit0});
                         _private.aData.push({name: 'pDisplayLength', value: oSettings.pDisplayLength});
                         _private.aData.push({name: 'pOrder', value: oSettings.pOrderField});
-                        _private.aData.push({name: 'pFilterCols', value: axAjax.stringPost(_private.pFilterCols)});
-                        
+                        _private.aData.push({name: 'pFilterCols', value: filters});
+                   
                         var datosx = _private.serialize();
                         
                         $.ajax({
@@ -1326,13 +1776,14 @@
                                         });
                                     }
                                 }
-
-                                oSettings.sData  = data;
+                                
+                                oSettings.pFilterCols = '';
+                                oSettings.sData  = (data.length > 0)?data:[];
 
                                 /*generar registros*/
                                 _private.records(oSettings);
 
-                                /*generar paginacion*/
+                                /*generar paginacion*/ 
                                 _private.paginate(oSettings);
 
                                 /*se ejecuta callback*/
@@ -1347,7 +1798,7 @@
                                 /*oculto lo eventos de la grilla: button, a, chk_all*/
                                 axScript.removeAttr.click({
                                     container: "#"+oSettings.tObjectTable,
-                                    typeElement: "button, a, #"+oSettings.tObjectTable+"_chkall_0 input:checkbox"
+                                    typeElement: "button, a, span, #"+oSettings.tObjectTable+"_chkall_0 input:checkbox"
                                 }); 
                                 
                                 /*ejecutar el scroll*/

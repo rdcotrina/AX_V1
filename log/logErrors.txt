@@ -1,20 +1,40 @@
 
 ERROR EN EL CLIENTE:
 ====================
-Fecha: 31-05-2015 10:05:18
-Archivo: http://localhost/AX_V1/app/Acciones/views/js/Acciones.js?397672967647929
-Método: Acciones_/_public.main/&lt;.fnCallback
-Error: Menu is not defined
-Línea: 35
-Columna: 20
+Fecha: 06-06-2015 11:06:48
+Archivo: http://localhost/AX_V1/app/Acciones/views/js/Acciones.js?957021022821231
+Método: Acciones_/_public.getAlias
+Error: rows is undefined
+Línea: 120
+Columna: 12
 
 
-ERROR EN EL SERVIDOR:
+ERROR EN EL CLIENTE:
 ====================
-Fecha: 31-05-2015 11:05:17
-Archivo: D:\xampp\htdocs\AX_V1\bin\View.php
-Método: render
-Error: Error de vista: <b>D:\xampp\htdocs\AX_V1\app\acciones\views\index.phtml</b> no encontrada .
-Línea: 54
+Fecha: 06-06-2015 11:06:27
+Archivo: http://localhost/AX_V1/app/Acciones/views/js/Acciones.js?441893785887193
+Método: Acciones_/_public.getAlias
+Error: d is undefined
+Línea: 120
+Columna: 12
 
+
+ERROR EN EL CLIENTE:
+====================
+Fecha: 06-06-2015 11:06:20
+Archivo: http://localhost/AX_V1/app/Acciones/views/js/Acciones.js?883541316752553
+Método: Acciones_/_public.getAlias
+Error: d is undefined
+Línea: 120
+Columna: 12
+
+
+ERROR EN EL CLIENTE:
+====================
+Fecha: 12-06-2015 08:06:12
+Archivo: undefined
+
+Error: Cannot read property &#039;post&#039; of undefined
+Línea: undefined
+Columna: undefined
 
