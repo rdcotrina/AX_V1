@@ -30,7 +30,7 @@
                 tColumns: [],                                       /*columnas del header*/
                 tMsnNoData: 'No se encontraron registros.',
                 tNumbers: true,                                     /*para mostrar la numeracion*/
-                tShowHideColumn: false,
+                tShowHideColumn: false,                             /*para mostrar-oucltar columnas, se recomienda no usar cuando se active el scrool horizontal*/
                 sAjaxSource: null,                                  /*url para la data via ajax*/
                 pPaginate: true,
                 pDisplayStart: 0,
@@ -160,39 +160,241 @@
                 }
             };
             
-            _private.addTopButtons = function(oSettings){
+            /*
+             * Obtiene las columnas
+             * @param {type} oSettings
+             * @returns {oSettings.sExport.columns|oSettings.tColumns}
+             */
+            _private.getColumnsExport = function(oSettings){
+                var exCol = (oSettings.sExport.columns !== undefined)?oSettings.sExport.columns:oSettings.tColumns;
+                return exCol;
+            };
+            
+            /*
+             * Retorna el nombre del archivo a crear
+             * @param {type} oSettings
+             * @returns {String|oSettings.sExport.nameFile|dataGrid.jquery_L8.dataGrid.jqueryAnonym$0.dataGrid._private.getFileName.myRand}
+             */
+            _private.getFileName = function(oSettings){
+                var myRand   = parseInt(Math.random()*999999999999999);
+                var nFile    = (oSettings.sExport.nameFile !== undefined)?oSettings.sExport.nameFile: 'file';
+                
+                return nFile+myRand;
+            };
+            
+            /*
+             * Crea el archivo excel
+             * @param {type} data
+             * @param {type} oSettings
+             * @returns {undefined}
+             */
+            _private.createFileExcel = function(data, oSettings){
+                excelFactory.create({
+                    data: data,
+                    rows: _private.getColumnsExport(oSettings)
+                });
+            };
+            
+            /*
+             * Crear html a exportar
+             * @param {type} data
+             * @param {type} oSettings
+             * @param {type} doc
+             * @returns {String}
+             */
+            _private.createHtmlExport = function(data, oSettings,doc){
+                var columns = columnsExport(oSettings);
+                var caption = (oSettings.sExport.caption !== undefined) ? oSettings.sExport.caption : '';
+                    //'+oSettings.tLogo+'
+                var pag = '';
+                if(doc === 'P'){
+                    pag = '<div>{{page}}/{{totalPages}}</div>'; /*si es PDF mostrar paginacion*/
+                }
+                var tableEx = '<HEADER>'+pag+'</HEADER>';
+                tableEx += '<table border="1">';
+                tableEx += '<caption>'+normalize(caption)+'</caption>';
+                tableEx += '<thead>';
+                tableEx += '<tr>';
+
+                tableEx += '<th>Nro.</th>';
+                /*recorrido de columnas*/
+                for (var c in columns) {
+                    /*esta validacion es solo para ERP UNI*/
+                    if(c < columns.length){
+                        var title = (columns[c].title !== undefined) ? normalize(columns[c].title) : '';
+                        tableEx += '<th>'+title+'</th>';
+                    }
+                }
+                /*================================*/
+                var lll = data.length,
+                    n = 0;
+                if (data.length) {
+                    /*recorrido de los registros del server*/
+                    for (var r in data) {
+                        if(r < lll){
+                            n++;
+                            tableEx += '<tr>';
+                            tableEx += '<td>'+n+'</td>';
+
+                            var ncol = columns.length;
+                            /*recorrido de columnas configuradas en js*/
+                            for (var c in columns) {
+                                /*esta validacion es solo para ERP UNI*/
+                                if(c < ncol){
+                                    var zell = (data[r][columns[c].campo] == null)? '': normalize(data[r][columns[c].campo]);
+                                    tableEx += '<td>'+zell+'</td>';
+                                }
+                            }
+                            tableEx += '</tr>';
+                        }
+                    }
+                } else {
+                    tableEx += '<tr>';
+                    tableEx += '<td><div class="alert alert-info center"><i class="fa-info"></i> No se encontraron registros.<div></td>';
+                    tableEx += '</tr>';
+                }
+                /*=================================*/
+                tableEx += '<tr>';
+                tableEx += '</thead>';
+                tableEx += '</table>';
+                return tableEx;
+            };
+            
+            /*
+             * Ajax para exportar datos
+             * @param {type} oSettings
+             * @param {type} params
+             * @param {type} doc
+             * @returns {undefined}
+             */
+            _private.ajaxExport = function(oSettings,params,doc,btn){
+                $(btn).attr('disabled',true);
+                /*inica efecto loading*/
+                _private.iniLoading(oSettings);
+                
+                $.ajax({
+                    type: "POST",
+                    data: params+'&_sExport=1',
+                    url: oSettings.ajaxSource,
+                    dataType: 'json',
+                    success: function(data) {
+                        /*validar error del SP*/
+                        if (data.length > 0 || data.error !== undefined) {
+                            /*no es un array, servidor devuelve cadena, y el unico q devuelve cadena es el ERROR del SP*/
+                            if (data instanceof Object === false || data.error !== undefined) {
+                                var msn = data;
+                                if (data.error !== undefined) {
+                                    msn = data.error;
+                                }
+                                alert(msn);
+                            }
+                        }
+
+                        switch(doc.toString()){
+                            case 'E':/*a excel*/
+                                _private.createFileExcel(data, oSettings);
+                                break;
+                            case 'P':/*a PDF*/
+                                /*generar html*/
+                                var html = generateHtmlExport(data, oSettings);
+                                
+                                createJsPDF(oSettings,html);
+                                break;
+                        }
+
+                        /*finaliza efecto loading*/
+                        _private.endLoading(oSettings);
+                        
+                        $(btn).attr('disabled',false);
+                    }
+                });
+            };
+            
+            /*
+             * Crea los botones en toolbar
+             * @param {type} oSettings
+             * @param {type} params
+             * @returns {undefined}
+             */
+            _private.addTopButtons = function(oSettings,params){
                 var toolbar = $('<div></div>');
-                toolbar.attr('id','toolbar_'+oSettings.tObjectTable);
+                toolbar.attr('id','toolbar_cont_'+oSettings.tObjectTable);
                 toolbar.addClass('dt-toolbar text-right');
                 toolbar.css({
-                   'padding':'3px'
+                   padding:'3px',
+                   position: 'relative'
                 });
+
+                /*div group*/
+                var toolbarIn = $('<div></div>');
+                toolbarIn.addClass('btn-group');
+                toolbarIn.attr('id','toolbar_'+oSettings.tObjectTable);
+
+                $(toolbar).html(toolbarIn);
 
                 /*agregando toolbar a tObjectContainer*/
                 $('#'+oSettings.tObjectContainer).html(toolbar);
                 
+                
+                var dataFilter = 'hs_cols';
+                
+                
+                /*======================AGREGAR BOTON EXPORTAR EXCEL========================*/
+                if(oSettings.sExport.buttons.excel && oSettings.sExport.buttons.excel !== undefined){
+                    var btnExcel = $('<button></button>');
+                    btnExcel.attr('type','button');
+                    btnExcel.addClass('btn btn-default');
+                    btnExcel.html('<i class="fa fa-file-excel-o"></i> Excel');
+                    btnExcel.click(function(){
+                        _private.ajaxExport(oSettings,params,'E',this);
+                    });
+                    
+                    $('#toolbar_'+oSettings.tObjectTable).append(btnExcel);
+                }
+                /*======================FIN AGREGAR BOTON EXPORTAR EXCEL========================*/
+                
+                /*======================AGREGAR BOTON EXPORTAR PF========================*/
+                if(oSettings.sExport.buttons.pdf && oSettings.sExport.buttons.pdf !== undefined){
+                    var btnPDF = $('<button></button>');
+                    btnPDF.attr('type','button');
+                    btnPDF.addClass('btn btn-default');
+                    btnPDF.html('<i class="fa fa-file-pdf-o"></i> PDF');
+                    btnPDF.click(function(){
+                        _private.ajaxExport(oSettings,params,'P',this);
+                    });
+                    
+                    $('#toolbar_'+oSettings.tObjectTable).append(btnPDF);
+                }
+                /*======================FIN AGREGAR BOTON EXPORTAR PF========================*/
+                
+                
+                /*===========================AGREGANDO BOTON VER-OCULTAR COLUMNAS==================*/
                 /*varificar si se activo tShowHideColumn*/
                 if(oSettings.tShowHideColumn){
                     var btnSHColumn = $('<button></button>');
                     btnSHColumn.attr('type','button');
                     btnSHColumn.addClass('btn btn-default');
-                    btnSHColumn.html('<i class="fa fa-random" style="padding-left:4px"></i> Ver/Ocultar Cols&nbsp;');
+                    btnSHColumn.html('<i class="fa fa-random" data-filter="'+dataFilter+'"></i> Ver/Ocultar Cols');
                     btnSHColumn.click(function(){
                         $('#contvo_'+oSettings.tObjectTable).toggle();
                     });
-                
+                    btnSHColumn.attr('data-filter',dataFilter);
+                    
                     /*agregando btnSHColumn a toolbar*/
-                    $('#toolbar_'+oSettings.tObjectTable).html(btnSHColumn);
+                    $('#toolbar_'+oSettings.tObjectTable).append(btnSHColumn);
+                    
+                    
                     
                     /*creando opciones para ver - ocultar*/
                     var ul = $('<ul></ul>');
                     ul.attr('id','contvo_'+oSettings.tObjectTable);
                     ul.addClass('ColVis_collection');
-//                    ul.attr('data-filter','contvo_'+oSettings.tObjectTable);
+                    ul.attr('data-filter',dataFilter);
                     ul.css({
                         position: 'absolute',
                         right: '5px',
-                        display: 'none'
+                        display: 'none',
+                        top: '32px'
                     });
                     
                     for(var i in oSettings.tColumns){
@@ -210,14 +412,18 @@
                                 $('.col_'+dfield).hide();
                             }
                         });
-                        
+                        li.find('label').attr('data-filter',dataFilter);
+                        li.find('input').attr('data-filter',dataFilter);
+                        li.find('span').attr('data-filter',dataFilter);
+                        li.attr('data-filter',dataFilter);
                         ul.append(li);
                     }
                     
                     $('#toolbar_'+oSettings.tObjectTable).append(ul);
-                    
-                    FIELDS.push('contvo_'+oSettings.tObjectTable);
                 }
+                /*fin de boton ver-mostrar columnas*/
+                
+                
             };
             
             /*
@@ -1873,9 +2079,10 @@
                      * Inicia el dataGrid
                      */
                     ini: function(){
+                        var params = _private.serialize();
                         
                         /*agregando botones*/
-                        _private.addTopButtons(oSettings);
+                        _private.addTopButtons(oSettings,params);
                         
                         /*la tabla*/
                         _private.table(oSettings);
@@ -1902,6 +2109,10 @@
                                     if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent && FIELDS[i]){
                                         $('#cont_filter_'+oSettings.tObjectTable+'_'+FIELDS[i]).css({display: 'none'});
                                     }
+                                }
+                                
+                                if($(a.target).attr('data-filter') !== 'hs_cols'){
+                                    $('#contvo_'+oSettings.tObjectTable).css({display: 'none'});
                                 }
                             });
                         }

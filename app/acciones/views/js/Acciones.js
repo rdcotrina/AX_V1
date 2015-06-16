@@ -166,6 +166,18 @@ var Acciones_ = function() {
                 },
                 {title: lang.generic.EST, field: "estado", width: "250", sortable: true, class: "center",filter:{type:"text"}}
             ],
+            sExport:{
+                buttons:{excel:true,pdf:true},
+                nameFile: 'axs',
+                orientation: 'landscape',
+                caption: 'RELACIÓN DE ACCIONES',
+                columns:[
+                    {title:lang.Acciones.AXION ,field:'accion',type: 'string'},
+                    {title:lang.Acciones.DISEN ,field:'disenio'},
+                    {title:lang.Acciones.ALAIS ,field:'alias'},
+                    {title:lang.generic.EST ,field:'estado'}
+                ]
+            },
             pPaginate: true,
             sAxions: {
                 width: '200',

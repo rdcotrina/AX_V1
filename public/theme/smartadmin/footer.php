@@ -75,6 +75,14 @@
     
     <script src="<?php echo $rutaLayout['_root']; ?>public/js/scrollTable/scrollTable.js"></script>
     
+    <!-- EXCEL FACTORY -->
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/require.min.js"></script>
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/underscore.min.js"></script>
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/json2.js"></script>
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/swfobject.js"></script>
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/downloadify.min.js"></script>
+    <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/excelFactory.js"></script>
+    
     
     <?php require_once (ROOT . 'config' . DS . 'prefijosJs.php'); ?>
     <!--se cierra tabs a prefijosJS JS debido a q en el archivo debe permanecer abierto para agregar las constantes con CREATOR-->
