@@ -30,6 +30,7 @@
                 tColumns: [],                                       /*columnas del header*/
                 tMsnNoData: 'No se encontraron registros.',
                 tNumbers: true,                                     /*para mostrar la numeracion*/
+                tShowHideColumn: false,
                 sAjaxSource: null,                                  /*url para la data via ajax*/
                 pPaginate: true,
                 pDisplayStart: 0,
@@ -159,20 +160,78 @@
                 }
             };
             
+            _private.addTopButtons = function(oSettings){
+                var toolbar = $('<div></div>');
+                toolbar.attr('id','toolbar_'+oSettings.tObjectTable);
+                toolbar.addClass('dt-toolbar text-right');
+                toolbar.css({
+                   'padding':'3px'
+                });
+
+                /*agregando toolbar a tObjectContainer*/
+                $('#'+oSettings.tObjectContainer).html(toolbar);
+                
+                /*varificar si se activo tShowHideColumn*/
+                if(oSettings.tShowHideColumn){
+                    var btnSHColumn = $('<button></button>');
+                    btnSHColumn.attr('type','button');
+                    btnSHColumn.addClass('btn btn-default');
+                    btnSHColumn.html('<i class="fa fa-random" style="padding-left:4px"></i> Ver/Ocultar Cols&nbsp;');
+                    btnSHColumn.click(function(){
+                        $('#contvo_'+oSettings.tObjectTable).toggle();
+                    });
+                
+                    /*agregando btnSHColumn a toolbar*/
+                    $('#toolbar_'+oSettings.tObjectTable).html(btnSHColumn);
+                    
+                    /*creando opciones para ver - ocultar*/
+                    var ul = $('<ul></ul>');
+                    ul.attr('id','contvo_'+oSettings.tObjectTable);
+                    ul.addClass('ColVis_collection');
+//                    ul.attr('data-filter','contvo_'+oSettings.tObjectTable);
+                    ul.css({
+                        position: 'absolute',
+                        right: '5px',
+                        display: 'none'
+                    });
+                    
+                    for(var i in oSettings.tColumns){
+                        var title = (oSettings.tColumns[i].title !== undefined)?oSettings.tColumns[i].title:'[field] no definido.';
+                        var field = (oSettings.tColumns[i].field !== undefined)?oSettings.tColumns[i].field:'[field] no definido.';
+                        
+                        var li = $('<li></li>');
+                        li.html('<label><input type="checkbox" data-field="'+field+'" checked><span>'+title+'</span></label>');
+                        li.find('input').click(function(){
+                            /*para ver - ocultar columnas*/
+                            var dfield = $(this).data('field');
+                            if($(this).is(':checked')){
+                                $('.col_'+dfield).show();
+                            }else{
+                                $('.col_'+dfield).hide();
+                            }
+                        });
+                        
+                        ul.append(li);
+                    }
+                    
+                    $('#toolbar_'+oSettings.tObjectTable).append(ul);
+                    
+                    FIELDS.push('contvo_'+oSettings.tObjectTable);
+                }
+            };
+            
             /*
              * Crea la tabla para el dataGrid
              * @param {type} oSettings
              * @returns {undefined}
              */
             _private.table = function(oSettings){
-                oSettings.tObjectTable = 'tab_'+oSettings.tObjectContainer;
-                
                 var tb = $('<table></table>');
                 tb.attr('id',oSettings.tObjectTable);
                 tb.attr('class',_private.cssTable);
                 
                 /*agregando tabla a div*/
-                $('#'+oSettings.tObjectContainer).html(tb);
+                $('#'+oSettings.tObjectContainer).append(tb);
             };
             
             /*
@@ -877,6 +936,7 @@
                     th.css({width: width, 'vertical-align': 'middle'});                                          /*agregando width de columna*/
                     th.append(title);                                                 /*se agrega el titulo*/
                     th.attr('data-order',field);
+                    th.addClass('col_'+field);                                      /*para tShowHideColumn*/
                     
                     /*agregando css para sortable*/
                     if(sortable !== ''){
@@ -1689,6 +1749,8 @@
                             var td          = $('<td></td>');         /*se crea la columna*/
                             var width       = (oSettings.tColumns[c].width !== undefined) ? oSettings.tColumns[c].width + oSettings.tWidthFormat : '';
                             var klass       = (oSettings.tColumns[c].class !== undefined) ? oSettings.tColumns[c].class : '';     /*clase css para <td>*/
+                            var field       = (oSettings.tColumns[c].field !== undefined) ? data[r][oSettings.tColumns[c].field] : '[field] no definido.';
+                            var kfield      = (oSettings.tColumns[c].field !== undefined) ? oSettings.tColumns[c].field : '[field] no definido.';
                             var fnCallback  = (oSettings.tColumns[c].fnCallback !== undefined) ? oSettings.tColumns[c].fnCallback : '';     /*closure css para <td>*/
                             /*parametros para ajax*/
                             var ajax        = (oSettings.tColumns[c].ajax !== undefined) ? oSettings.tColumns[c].ajax : '';       /*ajax para <td>*/
@@ -1704,7 +1766,7 @@
                                 serverParams= (ajax.serverParams !== undefined) ? ajax.serverParams : '';  /*parametros desde el servidor*/
                             }
 
-                            var texto = data[r][oSettings.tColumns[c].field];
+                            var texto = field;
                             
                             /*agregando ajax*/
                             if (fn) {
@@ -1723,12 +1785,12 @@
                                 fn = fn + '(' + xparams + ')';
                                 texto = $('<a></a>');
                                 texto.attr('href','javascript:;');
-                                texto.html(data[r][oSettings.tColumns[c].field]);
+                                texto.html(field);
                                 texto.attr('onclick',fn);
                             }
                             td.html(texto);                         /*contenido original de <td>*/
                             td.attr('class', klass);                /*agregado class css*/
-                            
+                            td.addClass('col_'+kfield);             /*para tShowHideColumn*/
                             /*verificar si se ordena para marcar*/
                             var classort = _private.cebraCol(r, oSettings, oSettings.tColumns[c].field);
                             
@@ -1777,6 +1839,8 @@
             return this.each(function(){
                 
                 var oSettings = options;
+                /*generando id de tabla*/
+                oSettings.tObjectTable = 'tab_'+oSettings.tObjectContainer;
                 
                 $.method = {
                     
@@ -1810,6 +1874,9 @@
                      */
                     ini: function(){
                         
+                        /*agregando botones*/
+                        _private.addTopButtons(oSettings);
+                        
                         /*la tabla*/
                         _private.table(oSettings);
                         
@@ -1832,7 +1899,7 @@
                             $(document).click(function(a) {
                                 for(var i in FIELDS){
                                     var filterParent = $(a.target).parent().attr('data-filter');    /*cuando es un date*/
-                                    if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent){
+                                    if(FIELDS[i] !== $(a.target).attr('data-filter') && FIELDS[i] !== filterParent && FIELDS[i]){
                                         $('#cont_filter_'+oSettings.tObjectTable+'_'+FIELDS[i]).css({display: 'none'});
                                     }
                                 }

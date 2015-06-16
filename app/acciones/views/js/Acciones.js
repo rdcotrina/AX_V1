@@ -118,6 +118,7 @@ var Acciones_ = function() {
         $("#"+tabs.T2+"gridAcciones2").dataGrid({
             tWidthFormat: "px",
             tScrollY: "200px",
+            tShowHideColumn: true,
             tRegsLength: [3, 25, 50, 100],
             pOrderField: 'accion asc',
             pDisplayLength: 3,
