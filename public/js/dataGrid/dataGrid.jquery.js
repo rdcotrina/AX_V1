@@ -196,35 +196,31 @@
             };
             
             /*
-             * Crear html a exportar
+             * Crear html a exportar pdf
              * @param {type} data
              * @param {type} oSettings
              * @param {type} doc
              * @returns {String}
              */
-            _private.createHtmlExport = function(data, oSettings,doc){
-                var columns = columnsExport(oSettings);
+            _private.createHtmlExport = function(data, oSettings){
+                var columns = _private.getColumnsExport(oSettings);
                 var caption = (oSettings.sExport.caption !== undefined) ? oSettings.sExport.caption : '';
                     //'+oSettings.tLogo+'
-                var pag = '';
-                if(doc === 'P'){
-                    pag = '<div>{{page}}/{{totalPages}}</div>'; /*si es PDF mostrar paginacion*/
-                }
+                var pag = '<div>{{page}}/{{totalPages}}</div>'; /*si es PDF mostrar paginacion*/
                 var tableEx = '<HEADER>'+pag+'</HEADER>';
                 tableEx += '<table border="1">';
-                tableEx += '<caption>'+normalize(caption)+'</caption>';
+                tableEx += '<caption>'+caption+'</caption>';
                 tableEx += '<thead>';
                 tableEx += '<tr>';
 
                 tableEx += '<th>Nro.</th>';
                 /*recorrido de columnas*/
                 for (var c in columns) {
-                    /*esta validacion es solo para ERP UNI*/
-                    if(c < columns.length){
-                        var title = (columns[c].title !== undefined) ? normalize(columns[c].title) : '';
-                        tableEx += '<th>'+title+'</th>';
-                    }
+                    var title = (columns[c].title !== undefined) ? columns[c].title : '';
+                    tableEx += '<th>'+title+'</th>';
                 }
+                tableEx += '</thead>';
+                tableEx += '<tbody>';
                 /*================================*/
                 var lll = data.length,
                     n = 0;
@@ -241,7 +237,7 @@
                             for (var c in columns) {
                                 /*esta validacion es solo para ERP UNI*/
                                 if(c < ncol){
-                                    var zell = (data[r][columns[c].campo] == null)? '': normalize(data[r][columns[c].campo]);
+                                    var zell = (data[r][columns[c].field] === null)? '': data[r][columns[c].field];
                                     tableEx += '<td>'+zell+'</td>';
                                 }
                             }
@@ -254,10 +250,85 @@
                     tableEx += '</tr>';
                 }
                 /*=================================*/
-                tableEx += '<tr>';
-                tableEx += '</thead>';
+                tableEx +=  '</tbody>';
                 tableEx += '</table>';
                 return tableEx;
+            };
+            
+            /*
+             * Crear pdf con js
+             * @param {type} oSettings
+             * @param {type} html
+             * @returns {undefined}
+             */
+            _private.createFilePDF = function(oSettings,html){
+                var land = (oSettings.sExport.orientation !== undefined)?oSettings.sExport.orientation:'P';
+                var nameFile = _private.getFileName(oSettings);
+                
+                //'l', 'mm', [ 841.89,  595.28]
+                var pdf = new jsPDF(land)
+                    , source = html
+                // we support special element handlers. Register them with jQuery-style
+                // ID selector for either ID or node name. ("#iAmID", "div", "span" etc.)
+                // There is no support for any other type of selectors
+                // (class, of compound) at this time.
+                    , specialElementHandlers = {
+
+                    },
+                margins = {
+                    top: 10,
+                    bottom: 10,
+                    left: 30,
+                    width: 1700
+                };
+                
+                //pdf.addImage(oSettings.tLogo, 'png', 15, 10, 200, 70);
+                // all coords and widths are in jsPDF instance's declared units
+                // 'inches' in this case
+                pdf.fromHTML(
+                    source // HTML string or DOM elem ref.
+                    , margins.left // x coord
+                    , margins.top // y coord
+                    , {
+                        'width': margins.width // max width of content on PDF
+                        , 'elementHandlers': specialElementHandlers
+                    },
+                    function(dispose) {
+                        // dispose: object with X, Y of the last line add to the PDF
+                        //          this allow the insertion of new lines after html
+                        $.each(pdf.internal.pages, function (index, value) {
+                            if (value) {
+                                $.each(value, function (innerIndex, innerValue) {
+                                    var continueAfterThis = true;
+                                    if (innerValue.indexOf('{{page}}') > -1) {
+                                        //value[innerIndex] = innerValue.replace('{{{logo}}}',oSettings.tLogo);
+                                        //pdf.internal.addImage(oSettings.tLogo, 'png', 15, 10, 200, 80);
+                                        continueAfterThis = false;
+                                    }
+                                    return continueAfterThis;
+                                });
+                                $.each(value, function (innerIndex, innerValue) {
+                                    var continueAfterThis = true;
+                                    if (innerValue.indexOf('{{totalPages}}') > -1) {
+                                        value[innerIndex] = innerValue.replace('{{totalPages}}', pdf.internal.getNumberOfPages);
+                                        continueAfterThis = false;
+                                    }
+                                    return continueAfterThis;
+                                });
+                                $.each(value, function (innerIndex, innerValue) {
+                                    var continueAfterThis = true;
+                                    if (innerValue.indexOf('{{page}}') > -1) {
+                                        value[innerIndex] = innerValue.replace('{{page}}', index);
+                                        continueAfterThis = false;
+                                    }
+                                    return continueAfterThis;
+                                });
+                            }
+                        });
+                        pdf.save(nameFile+'.pdf');
+                    },
+                    margins
+                );
             };
             
             /*
@@ -296,9 +367,9 @@
                                 break;
                             case 'P':/*a PDF*/
                                 /*generar html*/
-                                var html = generateHtmlExport(data, oSettings);
+                                var html = _private.createHtmlExport(data, oSettings);
                                 
-                                createJsPDF(oSettings,html);
+                                _private.createFilePDF(oSettings,html);
                                 break;
                         }
 
@@ -338,9 +409,10 @@
                 
                 var dataFilter = 'hs_cols';
                 
+                var sExport = (oSettings.sExport !== undefined)?oSettings.sExport:0;
                 
                 /*======================AGREGAR BOTON EXPORTAR EXCEL========================*/
-                if(oSettings.sExport.buttons.excel && oSettings.sExport.buttons.excel !== undefined){
+                if(sExport.buttons.excel && sExport.buttons.excel !== undefined){
                     var btnExcel = $('<button></button>');
                     btnExcel.attr('type','button');
                     btnExcel.addClass('btn btn-default');
@@ -354,7 +426,7 @@
                 /*======================FIN AGREGAR BOTON EXPORTAR EXCEL========================*/
                 
                 /*======================AGREGAR BOTON EXPORTAR PF========================*/
-                if(oSettings.sExport.buttons.pdf && oSettings.sExport.buttons.pdf !== undefined){
+                if(sExport.buttons.pdf && sExport.buttons.pdf !== undefined){
                     var btnPDF = $('<button></button>');
                     btnPDF.attr('type','button');
                     btnPDF.addClass('btn btn-default');

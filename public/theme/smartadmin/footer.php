@@ -83,6 +83,20 @@
     <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/js/downloadify.min.js"></script>
     <script type="text/javascript" src="<?php echo $rutaLayout['_root']; ?>public/js/excelFactory/excelFactory.js"></script>
     
+    <!-- JSPDF -->
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.from_html.js"></script>
+
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.addimage.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/libs/png_support/png.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/libs/png_support/zlib.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.png_support.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.cell.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.standard_fonts_metrics.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.split_text_to_size.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/jspdf.plugin.total_pages.js"></script>
+    <script src="<?php echo $rutaLayout['_root']; ?>public/js/jsPDF/libs/FileSaver/FileSaver.js"></script>
+    
     
     <?php require_once (ROOT . 'config' . DS . 'prefijosJs.php'); ?>
     <!--se cierra tabs a prefijosJS JS debido a q en el archivo debe permanecer abierto para agregar las constantes con CREATOR-->

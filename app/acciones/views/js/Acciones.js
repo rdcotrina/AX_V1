@@ -42,7 +42,7 @@ var Acciones_ = function() {
                 },
                 fnCallback: function(data) {
                     $('#' + tabs.T2 + '_CONTAINER').html(data);
-                    //Acciones.getGridAcciones();
+                    Acciones.getGridAcciones();
                     Acciones.getGridAcciones2();
                 }
             });
