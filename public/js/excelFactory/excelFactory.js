@@ -89,10 +89,7 @@ var excelFactory_ = function(){
             }
         });
 
-        require([
-            'public/js/excelFactory/excel-builder',
-            'public/js/excelFactory/Template/BasicReport'
-        ], function (builder, BasicReport) {
+        require(['public/js/excelFactory/excel-builder','public/js/excelFactory/Template/BasicReport'], function (builder, BasicReport) {
             var jsonData = _private.setData(dataServer);
 
             var data = JSON.parse(jsonData);

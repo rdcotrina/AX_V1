@@ -411,33 +411,38 @@
                 
                 var sExport = (oSettings.sExport !== undefined)?oSettings.sExport:0;
                 
-                /*======================AGREGAR BOTON EXPORTAR EXCEL========================*/
-                if(sExport.buttons.excel && sExport.buttons.excel !== undefined){
-                    var btnExcel = $('<button></button>');
-                    btnExcel.attr('type','button');
-                    btnExcel.addClass('btn btn-default');
-                    btnExcel.html('<i class="fa fa-file-excel-o"></i> Excel');
-                    btnExcel.click(function(){
-                        _private.ajaxExport(oSettings,params,'E',this);
-                    });
-                    
-                    $('#toolbar_'+oSettings.tObjectTable).append(btnExcel);
+                /*verificar si se configuro exportaciones*/
+                if(sExport !== 0){
+                    /*======================AGREGAR BOTON EXPORTAR EXCEL========================*/
+                    if(sExport.buttons.excel && sExport.buttons.excel !== undefined){
+                        var btnExcel = $('<button></button>');
+                        btnExcel.attr('type','button');
+                        btnExcel.addClass('btn btn-default');
+                        btnExcel.html('<i class="fa fa-file-excel-o"></i> Excel');
+                        btnExcel.click(function(){
+                            _private.ajaxExport(oSettings,params,'E',this);
+                        });
+
+                        $('#toolbar_'+oSettings.tObjectTable).append(btnExcel);
+                    }
+                    /*======================FIN AGREGAR BOTON EXPORTAR EXCEL========================*/
+
+                    /*======================AGREGAR BOTON EXPORTAR PF========================*/
+                    if(sExport.buttons.pdf && sExport.buttons.pdf !== undefined){
+                        var btnPDF = $('<button></button>');
+                        btnPDF.attr('type','button');
+                        btnPDF.addClass('btn btn-default');
+                        btnPDF.html('<i class="fa fa-file-pdf-o"></i> PDF');
+                        btnPDF.click(function(){
+                            _private.ajaxExport(oSettings,params,'P',this);
+                        });
+
+                        $('#toolbar_'+oSettings.tObjectTable).append(btnPDF);
+                    }
+                    /*======================FIN AGREGAR BOTON EXPORTAR PF========================*/
                 }
-                /*======================FIN AGREGAR BOTON EXPORTAR EXCEL========================*/
                 
-                /*======================AGREGAR BOTON EXPORTAR PF========================*/
-                if(sExport.buttons.pdf && sExport.buttons.pdf !== undefined){
-                    var btnPDF = $('<button></button>');
-                    btnPDF.attr('type','button');
-                    btnPDF.addClass('btn btn-default');
-                    btnPDF.html('<i class="fa fa-file-pdf-o"></i> PDF');
-                    btnPDF.click(function(){
-                        _private.ajaxExport(oSettings,params,'P',this);
-                    });
-                    
-                    $('#toolbar_'+oSettings.tObjectTable).append(btnPDF);
-                }
-                /*======================FIN AGREGAR BOTON EXPORTAR PF========================*/
+                
                 
                 
                 /*===========================AGREGANDO BOTON VER-OCULTAR COLUMNAS==================*/
