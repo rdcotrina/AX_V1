@@ -31,6 +31,7 @@
                 tMsnNoData: 'No se encontraron registros.',
                 tNumbers: true,                                     /*para mostrar la numeracion*/
                 tShowHideColumn: false,                             /*para mostrar-oucltar columnas, se recomienda no usar cuando se active el scrool horizontal*/
+                tLabelAxion: 'Acciones',
                 sAjaxSource: null,                                  /*url para la data via ajax*/
                 pPaginate: true,
                 pDisplayStart: 0,
@@ -76,7 +77,7 @@
              * @returns {String}
              */
             _private.txtInfo = function(){
-                return 'comentado tmp';//`${_private.iniInfo} al ${_private.finInfo} de ${_private.totalInfo}`;
+                //return `${_private.iniInfo} al ${_private.finInfo} de ${_private.totalInfo}`;
             };
             
             _private.aData = [];
@@ -142,7 +143,7 @@
             };
             
             /*
-             * Crea head axion
+             * Crea columna con el texto axion en el head
              * @param {type} oSettings
              * @returns {$}
              */
@@ -154,14 +155,14 @@
                     var txtax = $('<th class="center"></th>');
                     txtax.css({width: oSettings.sAxions.width+oSettings.tWidthFormat});
                     txtax.attr('id',oSettings.tObjectTable+'_axions');
-                    txtax.html('Acciones');
+                    txtax.html(oSettings.tLabelAxion);
                     txtax.css({'vertical-align': 'middle'});
                     return txtax;
                 }
             };
             
             /*
-             * Obtiene las columnas
+             * Obtiene las columnas a exportar
              * @param {type} oSettings
              * @returns {oSettings.sExport.columns|oSettings.tColumns}
              */
@@ -648,15 +649,7 @@
                 operator1.attr('id','op1_'+oSettings.tObjectTable+'_'+field);
                 operator1.attr('data-filter',field);
                 operator1.attr('class','form-control operador1');
-                operator1.html('<option value="=">Igual</option>\n\
-                                <option value="!=">Diferente</option>\n\
-                                <option value=">">Mayor</option>\n\
-                                <option value=">=">Mayor o igual</option>\n\
-                                <option value="<">Menor</option>\n\
-                                <option value="<=">Menor o igual</option>\n\
-                                <option value="C">Comienza</option>\n\
-                                <option value="T">Termina</option>\n\
-                                <option value="LIKE">Contiene</option>');
+                operator1.html('<option value="=">Igual</option><option value="!=">Diferente</option><option value=">">Mayor</option><option value=">=">Mayor o igual</option><option value="<">Menor</option><option value="<=">Menor o igual</option><option value="C">Comienza</option><option value="T">Termina</option><option value="LIKE">Contiene</option>');
                 operator1.find('option').attr('data-filter',field);
                 divF.append(operator1);
                 
@@ -666,8 +659,7 @@
                 operator2.attr('data-filter',field);
                 operator2.attr('class', 'form-control operador2');
                 operator2.css({'margin-top': '5px', 'margin-bottom': '5px', width: '80px'});
-                operator2.html('<option value="AND">AND</option>\n\
-                                <option value="OR">OR</option>');
+                operator2.html('<option value="AND">AND</option><option value="OR">OR</option>');
                 operator2.find('option').attr('data-filter',field);
                 divF.append(operator2);
                 
@@ -677,18 +669,9 @@
                 operator3.attr('data-filter',field);
                 operator3.attr('class','form-control operador3');
                 operator3.css({'margin-bottom':'5px'});
-                operator3.html('<option value="=">Igual</option>\n\
-                                <option value="<>">Diferente</option>\n\
-                                <option value=">">Mayor</option>\n\
-                                <option value=">=">Mayor o igual</option>\n\
-                                <option value="<">Menor</option>\n\
-                                <option value="<=">Menor o igual</option>\n\
-                                <option value="C">Comienza</option>\n\
-                                <option value="T">Termina</option>\n\
-                                <option value="LIKE">Contiene</option>');
+                operator3.html('<option value="=">Igual</option><option value="<>">Diferente</option><option value=">">Mayor</option><option value=">=">Mayor o igual</option><option value="<">Menor</option><option value="<=">Menor o igual</option><option value="C">Comienza</option><option value="T">Termina</option><option value="LIKE">Contiene</option>');
                 operator3.find('option').attr('data-filter',field);
                 divF.append(operator3);
-                
                 
                 /*agregando filtro dos*/
                 var filter2 = null, cont, icon; 
@@ -888,7 +871,7 @@
                                         _private.executeFilter(oSettings);
                                     }
                                 });
-                                elementSearch.change(function(tecla) {
+                                elementSearch.change(function() {
                                     _private.executeFilter(oSettings);
                                 });
                                 
@@ -1100,7 +1083,8 @@
                     th.attr('id',idTH);
                     th.css({position: 'relative'});
                     th.addClass('hasinput');
-                        
+                    th.addClass('col_'+field);
+                    
                     var divg = $('<div></div>');
                     divg.attr('class','input-group input-group-md');                    
                     
@@ -1966,23 +1950,24 @@
              * @param {type} campo
              * @returns {String}
              */
-            _private.cebraCol = function(r, oSettings, campo) {
+            _private.cebraCol = function(c, oSettings, campo, r) {
                 var m, classort;
                 m = oSettings.pOrderField.split(' ');
                 classort = '';
                 
-                var cssTh = $('#'+oSettings.tObjectTable+'_head_th_'+r).is('.sorting');
+                /*verfificar si cplumna esta ordenada*/
+                var cssTh1 = $('#'+oSettings.tObjectTable+'_head_th_'+c).is('.sorting_asc');
+                var cssTh2 = $('#'+oSettings.tObjectTable+'_head_th_'+c).is('.sorting_desc');
                 
-                if (campo === m[0]) {
-                    classort = ' sorting_1';
-                    if (r % 2) {
-                        classort = ' sorting_2';
+                if(cssTh1 || cssTh2){
+                    if (campo === m[0]) {
+                        classort = ' sorting_1';
+                        if (r % 2) {
+                            classort = ' sorting_2';
+                        }
                     }
                 }
-                /*si tiene .soting no se envia css*/
-                if(cssTh){
-                    classort = '';
-                }
+                
                 return classort;
             };
             
@@ -2075,7 +2060,7 @@
                             td.attr('class', klass);                /*agregado class css*/
                             td.addClass('col_'+kfield);             /*para tShowHideColumn*/
                             /*verificar si se ordena para marcar*/
-                            var classort = _private.cebraCol(r, oSettings, oSettings.tColumns[c].field);
+                            var classort = _private.cebraCol(c, oSettings, oSettings.tColumns[c].field,r);
                             
                             td.addClass(classort);
                             

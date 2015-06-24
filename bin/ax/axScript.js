@@ -500,6 +500,25 @@ var axScript_ = function() {
         return t;
     };
 
+    /*muestra label segun estado*/
+    _public.labelState = function(e){
+        var $c = $('<label></label>');
+        $c.attr('class','label');
+        
+        switch (e){
+            case 'A':
+                $c.html('Activo');
+                $c.addClass('label-success');
+                break;
+            case 'I':
+                $c.html('Inctivo');
+                $c.addClass('label-danger');
+                break;
+        }
+        
+        return $c;
+    };
+    
     /*obtener permisos de botones*/
     _public.getPermiso = function(clave){
         for(var i in sys_permisos){

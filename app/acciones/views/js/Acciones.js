@@ -43,7 +43,7 @@ var Acciones_ = function() {
                 fnCallback: function(data) {
                     $('#' + tabs.T2 + '_CONTAINER').html(data);
                     Acciones.getGridAcciones();
-                    Acciones.getGridAcciones2();
+                    //Acciones.getGridAcciones2();
                 }
             });
         } catch (ex) {
@@ -57,13 +57,46 @@ var Acciones_ = function() {
 
         $("#"+tabs.T2+"gridAcciones").dataGrid({
             tScrollY: "200px",
-            tRegsLength: [3, 25, 50, 100],
-            pDisplayLength: 3,
+            pDisplayLength: 25,
+            tShowHideColumn: true,
+            pOrderField: 'accion asc',
             tColumns: [
-                {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,filter: {operator:"LIKE"}},
-                {title: lang.Acciones.DISEN, field: "disenio", width: "220", filter:{operator:"LIKE"}},
-                {title: lang.Acciones.ALAIS, field: "alias", width: "220", sortable: true,filter:{operator:"LIKE"}},
-                {title: lang.generic.EST, field: "estado", width: "220", sortable: true, class: "center",filter:{operator:"LIKE"}}
+                {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,filter: {type: 'text'}},
+                {
+                    title: lang.Acciones.DISEN, 
+                    width: "220", 
+                    field: "disenio", 
+                    class: "center",
+                    fnCallback:function(fila,row){
+                        return '<button type="button" class="'+row.theme+'"><i class="'+row.icono+'"></i></button>';
+                    }
+                },
+                {
+                    title: lang.Acciones.ALAIS, 
+                    field: "alias", 
+                    width: "220", 
+                    sortable: true,
+                    filter:{
+                        type:"select",
+                        ajaxData: _private.config.modulo+'getAlias',
+                        options:{label:'alias',value:'alias'}
+                    }
+                },
+                {
+                    title: lang.generic.EST, 
+                    width: "220", 
+                    field: "estado", 
+                    sortable: true, 
+                    class: "center",
+                    filter:{
+                        type:"select",
+                        dataClient:[{etiqueta:'Activo',value:'A'},{etiqueta:'Inactivo',value:'I'}],
+                        options:{label:'etiqueta',value:'value'}
+                    },
+                    fnCallback:function(fila,row){
+                        return axScript.labelState(row.estado);
+                    }
+                }
             ],
             pPaginate: true,
             sAxions: {
@@ -88,10 +121,7 @@ var Acciones_ = function() {
                 }]
             },
             tScroll:{
-                cFixedColsLeft: 2,
-                cFixedColsRight: 1,
-                cColsInHorizontalScroll: 2,
-                cRowsInVerticalScroll: 2
+                cColsInHorizontalScroll: 10
             },
             ajaxSource: _private.config.modulo+"getGridAcciones",
             fnCallback: function(oSettings) {

@@ -6,8 +6,6 @@
 * Descripcion : indexEmpleados.phtml
 * ---------------------------------------
 */
-$nuevo    = Session::getPermiso("ACCNEW");
-$eliminar = Session::getPermiso("ACCDE");
     
 echo SimpleForm::widgetOpen(array(
         "id"=>T2,
@@ -16,22 +14,9 @@ echo SimpleForm::widgetOpen(array(
 ?>
 
 
-<div id="<?php echo T2; ?>gridAcciones2"></div>
-<br><br><br><br>
+<!--<div id="<?php echo T2; ?>gridAcciones2"></div>-->
+
 <div id="<?php echo T2; ?>gridAcciones"></div>
 
-
-
-
-
-
-<div id="<?php echo T2; ?>gridAcciones2_btns">
-    <!-- verificar permisos -->
-    <?php if($nuevo["permiso"]): ?>
-    <button id="<?php echo T2; ?>btnNewEmpleados2" type="button" onclick="" class="<?php echo $nuevo["theme"]; ?>">
-        <i class="<?php echo $nuevo["icono"]; ?>"></i> <?php echo $nuevo["accion"]; ?>
-    </button>
-    <?php endif; ?>
-</div>
-
-<?php echo SimpleForm::widgetClose(); ?>
+<?php 
+    echo SimpleForm::widgetClose(); 
