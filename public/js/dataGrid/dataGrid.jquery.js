@@ -30,6 +30,7 @@
                 tColumns: [],                                       /*columnas del header*/
                 tMsnNoData: 'No se encontraron registros.',
                 tNumbers: true,                                     /*para mostrar la numeracion*/
+                tButtons: [],                                       /*botones en el toolbar*/
                 tShowHideColumn: false,                             /*para mostrar-oucltar columnas, se recomienda no usar cuando se active el scrool horizontal*/
                 tLabelAxion: 'Acciones',
                 sAjaxSource: null,                                  /*url para la data via ajax*/
@@ -38,8 +39,7 @@
                 pDisplayLength: 50,
                 pItemPaginas: 5,
                 pOrderField: '',                                    /*para el order ASC o DESC*/
-                sAxions: [],                                        /*acciones del grid*/
-                               
+                sAxions: []                                         /*acciones del grid*/
             };
             
             var options = $.extend(defaults, opt);
@@ -112,7 +112,7 @@
                     $('#'+oSettings.tObjectTable).scrollable({
                         fixedColumnsLeft: (scroll.cFixedColsLeft !== undefined)?scroll.cFixedColsLeft:0,
                         fixedColumnsRight: (scroll.cFixedColsRight !== undefined)?scroll.cFixedColsRight:0,
-                        columnsInScrollableArea: (scroll.cColsInHorizontalScroll !== undefined)?scroll.cColsInHorizontalScroll:5,
+                        columnsInScrollableArea: (scroll.cColsInHorizontalScroll !== undefined)?scroll.cColsInHorizontalScroll:7,
                         rowsInScrollableArea: (scroll.cRowsInVerticalScroll !== undefined)?scroll.cRowsInVerticalScroll:10,
                         rowsInFooter: (scroll.cRowsInFooter !== undefined)?scroll.cRowsInFooter:null,
                         rowsInHeader: (scroll.cRowsInHeader !== undefined)?scroll.cRowsInHeader:null
@@ -406,9 +406,37 @@
 
                 /*agregando toolbar a tObjectContainer*/
                 $('#'+oSettings.tObjectContainer).html(toolbar);
-                
-                
+
                 var dataFilter = 'hs_cols';
+                
+                
+                
+                /*===========================AGREGANDO BOTONES=======================*/
+                var btns = oSettings.tButtons;
+                
+                /*verificar si se configuro botones*/
+                if(btns.length && $.isArray(btns)){
+                    for(var b in btns){
+                        var access      = (btns[b].access !== undefined) ? btns[b].access : 0;
+                        var titulo      = (btns[b].titulo !== undefined) ? btns[b].titulo : '';
+                        var icono       = (btns[b].icono !== undefined) ? btns[b].icono : '';
+                        var klass       = (btns[b].class !== undefined) ? btns[b].class : 'btn btn-default';
+                        var ajax        = (btns[b].ajax !== undefined) ? btns[b].ajax : '';
+                        
+                        /*si tiene permiso se agrega el boton*/
+                        if(access){
+                            var butt = $('<button></button>');
+                            butt.attr('type','button');
+                            butt.attr('class',klass);
+                            butt.html('<i class="' + icono + '"></i> '+titulo);
+                            butt.attr('onclick',ajax);
+                        
+                            $('#toolbar_'+oSettings.tObjectTable).append(butt);
+                        }
+                    }
+                    
+                }
+                /*=========================FIN AGREGANDO BOTONES=====================*/
                 
                 var sExport = (oSettings.sExport !== undefined)?oSettings.sExport:0;
                 
@@ -442,9 +470,6 @@
                     }
                     /*======================FIN AGREGAR BOTON EXPORTAR PF========================*/
                 }
-                
-                
-                
                 
                 /*===========================AGREGANDO BOTON VER-OCULTAR COLUMNAS==================*/
                 /*varificar si se activo tShowHideColumn*/
@@ -500,8 +525,6 @@
                     $('#toolbar_'+oSettings.tObjectTable).append(ul);
                 }
                 /*fin de boton ver-mostrar columnas*/
-                
-                
             };
             
             /*

@@ -52,13 +52,13 @@ var Acciones_ = function() {
     };
 
     _public.getGridAcciones = function (){
+        var pNew    = axScript.getPermiso("ACCNEW");
         var pEdit   = axScript.getPermiso("ACCED");
         var pDelete = axScript.getPermiso("ACCDE");
 
         $("#"+tabs.T2+"gridAcciones").dataGrid({
             tScrollY: "200px",
             pDisplayLength: 25,
-            tShowHideColumn: true,
             pOrderField: 'accion asc',
             tColumns: [
                 {title: lang.Acciones.AXION,field: "accion",width: "300",sortable: true,filter: {type: 'text'}},
@@ -98,6 +98,13 @@ var Acciones_ = function() {
                     }
                 }
             ],
+            tButtons:[{
+                access: pNew.permiso,
+                icono: pNew.icono,
+                titulo: pNew.accion,
+                class: pNew.theme,
+                ajax: "Empleados.getFormEditEmpleados();"
+            }],
             pPaginate: true,
             sAxions: {
                 buttons:[{
@@ -121,7 +128,7 @@ var Acciones_ = function() {
                 }]
             },
             tScroll:{
-                cColsInHorizontalScroll: 10
+                cRowsInVerticalScroll: 7
             },
             ajaxSource: _private.config.modulo+"getGridAcciones",
             fnCallback: function(oSettings) {
