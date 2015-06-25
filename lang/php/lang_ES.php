@@ -100,3 +100,6 @@ define('AUDI_17','Eliminar menú');
 define('AUDI_18','Grabar opción');
 define('AUDI_19','Editar opción');
 define('AUDI_20','Eliminar opción');
+
+/*=====================================ACCIONES==================================*/
+define('AXI_1','Acciones');

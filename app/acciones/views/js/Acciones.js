@@ -128,7 +128,7 @@ var Acciones_ = function() {
                 }]
             },
             tScroll:{
-                cRowsInVerticalScroll: 7
+                cRowsInVerticalScroll: 10
             },
             ajaxSource: _private.config.modulo+"getGridAcciones",
             fnCallback: function(oSettings) {
