@@ -16,12 +16,12 @@ class AccionesModel extends Database{
     }
     
     private function _set(){
-        $this->_pDisplayStart  =   SimpleForm::getPost("pDisplayStart"); 
-        $this->_pDisplayLength =   SimpleForm::getPost("pDisplayLength"); 
-        $this->_pSortingCols   =   SimpleForm::getPost("pSortingCols");
-        $this->_pOrder         =   SimpleForm::getPost("pOrder");
-        $this->_sExport        =   SimpleForm::getPost("_sExport");
-        $this->_pFilterCols    =   htmlspecialchars(trim(AesCtr::de(SimpleForm::getPost("pFilterCols"))),ENT_QUOTES);
+        $this->_pDisplayStart  =   AxForm::getPost("pDisplayStart"); 
+        $this->_pDisplayLength =   AxForm::getPost("pDisplayLength"); 
+        $this->_pSortingCols   =   AxForm::getPost("pSortingCols");
+        $this->_pOrder         =   AxForm::getPost("pOrder");
+        $this->_sExport        =   AxForm::getPost("_sExport");
+        $this->_pFilterCols    =   htmlspecialchars(trim(AesCtr::de(AxForm::getPost("pFilterCols"))),ENT_QUOTES);
     }
     
     public function getGridAcciones(){

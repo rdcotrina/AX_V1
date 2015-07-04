@@ -10,7 +10,7 @@ class AuditoriaModel extends Database {
     }
 
     private function _set(){
-        $this->_txt  =   SimpleForm::getPost('_txt'); 
+        $this->_txt  =   AxForm::getPost('_txt'); 
         $this->_usuario = Session::get('sys_idUsuario');
     }
     

@@ -10,6 +10,50 @@ class Autoload{
         }
     }
 
+    public static function dir($dir,$subDirectorio=false){
+        $directorio=opendir($dir);
+        while ($archivo = readdir($directorio)){
+            switch(self::extension($archivo)){
+                case 'php': 
+                            /*
+                                *los archivos con prefijo not_ no se cargaran 
+                            */
+                            if(substr($archivo,0,4)!='not_'){
+                                require_once ($dir.$archivo); 
+                            }                     
+                            break;  
+                case 'css': 
+                            /*
+                                *los archivos con prefijo not_ tampoco se cargaran 
+                            */
+                            if(substr($archivo,0,4)!='not_'){
+                                echo '<link href="'.$dir.$archivo.'" rel="stylesheet" type="text/css"/>';
+                            }                               
+                            break;
+                case 'js':  
+                            /*
+                                *los archivos con prefijo not_ tampoco se cargaran 
+                            */
+                            if(substr($archivo,0,4)!='not_'){
+                                echo '<script type="text/javascript" src="'.$dir.$archivo.'"></script>';
+                            }                            
+                            break;
+               case 'phtml': 
+                            require_once $dir.$archivo; 
+                            break;
+                default:    
+                        if($subDirectorio){
+                            if($archivo != '.' && $archivo != '..'){
+                                $newdir = $dir.$archivo.'/';
+                                echo self::construct($newdir);
+                            } 
+                        }                 
+                        break;
+            }   
+        }
+        closedir($directorio);
+    }
+    
     public static function js($dir,$subDirectorio=false){
         $directorio=opendir($dir);
         while ($archivo = readdir($directorio)){

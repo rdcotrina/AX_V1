@@ -2,7 +2,7 @@
 
 class LoginController extends Controller{
     
-    private static $Auditoria;
+    use Auditoria;
     
     private static $loginModel;
 
@@ -10,7 +10,7 @@ class LoginController extends Controller{
         try{
             self::$loginModel = $this->loadModel();
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
 
@@ -43,7 +43,7 @@ class LoginController extends Controller{
             echo json_encode($data);
             
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -54,9 +54,9 @@ class LoginController extends Controller{
             echo json_encode($result);
 
 //            $ev = 'Salió del sistema';
-//            self::$Auditoria->logAuditoria($ev);
+//            $this->auditar()->logAuditoria($ev);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     

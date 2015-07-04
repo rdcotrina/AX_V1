@@ -105,6 +105,18 @@ var Acciones_ = function() {
                 class: pNew.theme,
                 ajax: "Empleados.getFormEditEmpleados();"
             }],
+        sExport:{
+                buttons:{excel:true,pdf:true},
+                nameFile: 'axs',
+                orientation: 'landscape',
+                caption: 'RELACIÓN DE ACCIONES',
+                columns:[
+                    {title:lang.Acciones.AXION ,field:'accion',type: 'string'},
+                    {title:lang.Acciones.DISEN ,field:'disenio'},
+                    {title:lang.Acciones.ALAIS ,field:'alias'},
+                    {title:lang.generic.EST ,field:'estado'}
+                ]
+            },
             pPaginate: true,
             sAxions: {
                 buttons:[{

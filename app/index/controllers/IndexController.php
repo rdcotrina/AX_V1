@@ -8,7 +8,7 @@
  */
 class IndexController extends Controller{
     
-    private static $Auditoria;
+    use Auditoria;
     
     private static $indexModel;
 
@@ -19,7 +19,7 @@ class IndexController extends Controller{
             self::$indexModel = $this->loadModel();
             self::$loginModel = $this->loadModel(array('modulo'=>'index','modelo'=>'Login'));
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
 
@@ -32,7 +32,7 @@ class IndexController extends Controller{
                 Obj::run()->View->render('login',false);
             }
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
         
     }
@@ -41,7 +41,7 @@ class IndexController extends Controller{
         try{
             return self::$loginModel->getMenu();
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -49,7 +49,7 @@ class IndexController extends Controller{
         try{
             return self::$loginModel->getAccionesOpcion($opcion);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -57,7 +57,7 @@ class IndexController extends Controller{
         try{
             Obj::run()->View->render();
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -69,15 +69,15 @@ class IndexController extends Controller{
             Obj::run()->View->render('lock',true);
             
             $ev = LBL_LOCK;
-            self::$Auditoria->logAuditoria($ev);
+            $this->auditar()->logAuditoria($ev);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function changeRol(){
         try{
-            $idRol = SimpleForm::getPost('_idRol');
+            $idRol = AxForm::getPost('_idRol');
             $rol   = Session::get('sys_defaultNameRol');
 
             foreach (Session::get('sys_roles') as $value) {
@@ -91,9 +91,9 @@ class IndexController extends Controller{
             echo json_encode($result);
             
             $ev = 'Cambió de rol: de '.$rol.' a '.Session::get('sys_defaultNameRol');
-            self::$Auditoria->logAuditoria($ev);
+            $this->auditar()->logAuditoria($ev);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
         
     }

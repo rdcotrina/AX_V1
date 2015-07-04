@@ -29,21 +29,21 @@ class MenuModel extends Database{
     }
     
     private function _set(){
-        $this->_flag            = SimpleForm::getPost('_flag');
-        $this->_idDominio       = Aes::de(SimpleForm::getPost('_idDominio'));    /*se decifra*/
-        $this->_idModulo        = Aes::de(SimpleForm::getPost('_idModulo'));
-        $this->_idMenuPrincipal = Aes::de(SimpleForm::getPost('_idMenuPrincipal'));
-        $this->_idOpcion        = Aes::de(SimpleForm::getPost('_idOpcion'));
-        $this->_lengthArray     = SimpleForm::getPost('_lengthArray'); /*para la ordenacion*/
-        $this->_dominio         = SimpleForm::getPost(T3.'txt_dominio');
-        $this->_modulo          = SimpleForm::getPost(T3.'txt_modulo');
-        $this->_menu            = SimpleForm::getPost(T3.'txt_menu');
-        $this->_opcion          = SimpleForm::getPost(T3.'txt_opcion');
-        $this->_alias           = SimpleForm::getPost(T3.'txt_alias');
-        $this->_url             = SimpleForm::getPost(T3.'txt_url');
-        $this->_icono           = SimpleForm::getPost(T3.'txt_icono');
-        $this->_class           = SimpleForm::getPost(T3.'txt_class');
-        $this->_activo          = SimpleForm::getPost(T3.'chk_activo');
+        $this->_flag            = AxForm::getPost('_flag');
+        $this->_idDominio       = Aes::de(AxForm::getPost('_idDominio'));    /*se decifra*/
+        $this->_idModulo        = Aes::de(AxForm::getPost('_idModulo'));
+        $this->_idMenuPrincipal = Aes::de(AxForm::getPost('_idMenuPrincipal'));
+        $this->_idOpcion        = Aes::de(AxForm::getPost('_idOpcion'));
+        $this->_lengthArray     = AxForm::getPost('_lengthArray'); /*para la ordenacion*/
+        $this->_dominio         = AxForm::getPost(T3.'txt_dominio');
+        $this->_modulo          = AxForm::getPost(T3.'txt_modulo');
+        $this->_menu            = AxForm::getPost(T3.'txt_menu');
+        $this->_opcion          = AxForm::getPost(T3.'txt_opcion');
+        $this->_alias           = AxForm::getPost(T3.'txt_alias');
+        $this->_url             = AxForm::getPost(T3.'txt_url');
+        $this->_icono           = AxForm::getPost(T3.'txt_icono');
+        $this->_class           = AxForm::getPost(T3.'txt_class');
+        $this->_activo          = AxForm::getPost(T3.'chk_activo');
         $this->_usuario         = Session::get('sys_idUsuario');
     }
     

@@ -25,11 +25,11 @@ class AuditoriaController extends Controller{
         
         if(empty($exception)){
             $_entorno   = 'ERROR EN EL CLIENTE:';
-            $_archivo   = 'Archivo: '.SimpleForm::getPost('_archivo');
-            $_metodo    = 'Método: '.SimpleForm::getPost('_metodo');
-            $_error     = 'Error: '.SimpleForm::getPost('_error');
-            $_columna   = 'Columna: '.SimpleForm::getPost('_columna');
-            $_linea     = 'Línea: '.SimpleForm::getPost('_linea');
+            $_archivo   = 'Archivo: '.AxForm::getPost('_archivo');
+            $_metodo    = 'Método: '.AxForm::getPost('_metodo');
+            $_error     = 'Error: '.AxForm::getPost('_error');
+            $_columna   = 'Columna: '.AxForm::getPost('_columna');
+            $_linea     = 'Línea: '.AxForm::getPost('_linea');
 
             $pos        = strpos($_metodo, '@');
             $_metodo    = substr($_metodo,0, $pos);

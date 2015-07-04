@@ -67,11 +67,6 @@ abstract class Controller extends Obj{
         }
     }
     
-    protected function loadAuditoria(){
-        require_once (ROOT . DEFAULT_APP_FOLDER . DS . 'auditoria' . DS . 'controllers' . DS . 'AuditoriaController.php');
-        return new AuditoriaController();
-    }
-
     protected function redirect($ruta = false){
         if($ruta){
             header('location:' . BASE_URL . $ruta);

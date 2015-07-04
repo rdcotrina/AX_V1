@@ -960,7 +960,7 @@
                                                     type: "POST",
                                                     url: url,
                                                     dataType: 'json',
-                                                    data:{_flag: flag, _field: field},       /*se envia configuracion de <select> porq la llamada es multiple*/
+                                                    data:{_flag: flag, _field: field, _options: options},       /*se envia configuracion de <select> porq la llamada es multiple*/
                                                     success: function(resp) {
                                                         data_s = resp;
                                                     }
@@ -984,7 +984,7 @@
                                         
                                         var oopp = '';
                                         for (var x in data_s.dataServer) {
-                                            oopp += '<option value="'+data_s.dataServer[x][options.value]+'">'+data_s.dataServer[x][options.label]+'</option>';
+                                            oopp += '<option value="'+data_s.dataServer[x][data_s.opt.value]+'">'+data_s.dataServer[x][data_s.opt.label]+'</option>';
                                         }
                                         
                                         elementSearch.append(oopp);

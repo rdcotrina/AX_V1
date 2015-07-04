@@ -12,9 +12,9 @@ class LoginModel extends Database{
     }
     
     public function getValidar(){
-        $flag = SimpleForm::getPost('_flag');
-        $user = Aes::de(SimpleForm::getPost('_user'));
-        $pass = Aes::de(SimpleForm::getPost('_clave'));
+        $flag = AxForm::getPost('_flag');
+        $user = Aes::de(AxForm::getPost('_user'));
+        $pass = Aes::de(AxForm::getPost('_clave'));
         
         $query = "call sp_confUsuarioConsultas(:flag,:user,:pass);";
         $parms = array(

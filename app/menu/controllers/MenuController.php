@@ -7,21 +7,20 @@
  */
 class MenuController extends Controller{
     
-    private static $Auditoria;
+    use Auditoria,Validate;
     
     private static $MenuModel;
 
     public function __construct() {
         self::$MenuModel = $this->loadModel();
-        self::$Auditoria = $this->loadAuditoria();
     }
 
     public function index(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(SimpleForm::getPost('_rootTitle'));
+            $this->auditar()->logAuditoria(AxForm::getPost('_rootTitle'));
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -30,7 +29,7 @@ class MenuController extends Controller{
             $rResult = self::$MenuModel->getDominios();
             return $rResult;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -39,7 +38,7 @@ class MenuController extends Controller{
             $rResult = self::$MenuModel->getModulos($dominio);
             return $rResult;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -48,7 +47,7 @@ class MenuController extends Controller{
             $rResult = self::$MenuModel->getMenus($modulo);
             return $rResult;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -57,7 +56,7 @@ class MenuController extends Controller{
             $rResult = self::$MenuModel->getOpciones($menu);
             return $rResult;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -65,130 +64,141 @@ class MenuController extends Controller{
         try{
             Obj::run()->View->render();
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formNuevoDominio(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_1);
+            $this->auditar()->logAuditoria(AUDI_1);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formNuevoModulo(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_2);
+            $this->auditar()->logAuditoria(AUDI_2);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formNewMenu(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_3);
+            $this->auditar()->logAuditoria(AUDI_3);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formEditDominio(){ 
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_4);
+            $this->auditar()->logAuditoria(AUDI_4);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formEditModulo(){ 
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_5);
+            $this->auditar()->logAuditoria(AUDI_5);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formEditMenu(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_6);
+            $this->auditar()->logAuditoria(AUDI_6);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formNewOpcion(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_7);
+            $this->auditar()->logAuditoria(AUDI_7);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function formEditOpcion(){
         try{
             Obj::run()->View->render();
-            self::$Auditoria->logAuditoria(AUDI_8);
+            $this->auditar()->logAuditoria(AUDI_8);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public static function getDominio(){
         try{
-            $data = self::$MenuModel->menuConsultas(2,SimpleForm::getPost('_idDominio'));
+            $data = self::$MenuModel->menuConsultas(2,AxForm::getPost('_idDominio'));
         
             return $data;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public static function findModulo(){ 
         try{
-            $data = self::$MenuModel->menuConsultas(4,SimpleForm::getPost('_idModulo'));
+            $data = self::$MenuModel->menuConsultas(4,AxForm::getPost('_idModulo'));
         
             return $data;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public static function findMenu(){ 
         try{
-            $data = self::$MenuModel->menuConsultas(6,SimpleForm::getPost('_idMenuPrincipal'));
+            $data = self::$MenuModel->menuConsultas(6,AxForm::getPost('_idMenuPrincipal'));
         
             return $data;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public static function findOpcion(){ 
         try{
-            $data = self::$MenuModel->menuConsultas(8,SimpleForm::getPost('_idOpcion'));
+            $data = self::$MenuModel->menuConsultas(8,AxForm::getPost('_idOpcion'));
         
             return $data;
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
     public function postNewDominio(){ 
         try{
+            $this->valida()->input(T3.'txt_dominio')
+                    ->rule(
+                        array('require','xxxx'),
+                        array('length|4','nnnnnnnn')
+                    );
+            $this->valida()->input(T3.'txt_icono')
+                    ->rule(
+                        array('require','xxxx'),
+                        array('length|4','nnnnnnnn')
+                    );
+            
             $data = self::$MenuModel->mantenimientoDominio();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_9);
+            $this->auditar()->logAuditoria(AUDI_9);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -197,9 +207,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoDominio();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_10);
+            $this->auditar()->logAuditoria(AUDI_10);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -208,9 +218,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoDominio();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_11);
+            $this->auditar()->logAuditoria(AUDI_11);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -219,9 +229,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoModulo();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_12);
+            $this->auditar()->logAuditoria(AUDI_12);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -230,9 +240,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoModulo();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_13);
+            $this->auditar()->logAuditoria(AUDI_13);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -241,9 +251,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoModulo();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_14);
+            $this->auditar()->logAuditoria(AUDI_14);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -252,9 +262,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoMenuPrincipal();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_15);
+            $this->auditar()->logAuditoria(AUDI_15);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -263,9 +273,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoMenuPrincipal();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_16);
+            $this->auditar()->logAuditoria(AUDI_16);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -274,9 +284,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoMenuPrincipal();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_17);
+            $this->auditar()->logAuditoria(AUDI_17);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -285,9 +295,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoOpcion();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_18);
+            $this->auditar()->logAuditoria(AUDI_18);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -296,9 +306,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoOpcion();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_19);
+            $this->auditar()->logAuditoria(AUDI_19);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -307,9 +317,9 @@ class MenuController extends Controller{
             $data = self::$MenuModel->mantenimientoOpcion();
         
             echo json_encode($data);
-            self::$Auditoria->logAuditoria(AUDI_20);
+            $this->auditar()->logAuditoria(AUDI_20);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -319,7 +329,7 @@ class MenuController extends Controller{
         
             echo json_encode($data);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -329,7 +339,7 @@ class MenuController extends Controller{
         
             echo json_encode($data);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -339,7 +349,7 @@ class MenuController extends Controller{
         
             echo json_encode($data);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -349,7 +359,7 @@ class MenuController extends Controller{
         
             echo json_encode($data);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     

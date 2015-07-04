@@ -51,3 +51,7 @@ spl_autoload_register('autoloadLibs');
 
 require_once (ROOT . 'config' . DS . 'prefijosPHP.php');
 require_once (ROOT . 'lang' . DS . 'php' . DS . 'lang_ES.php');
+require_once (ROOT . 'bin' . DS . 'Autoload.php');
+
+/*load traits*/
+Autoload::dir('bin/traits/');

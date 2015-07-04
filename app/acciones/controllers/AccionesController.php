@@ -2,20 +2,19 @@
 
 class AccionesController extends Controller{
     
-    private static $Auditoria;
+    use Auditoria;
     
     private static $AccionesModel;
 
     public function __construct() {
         self::$AccionesModel = $this->loadModel();
-        self::$Auditoria = $this->loadAuditoria();
     }
     
     public function index() {
         try{
             Obj::run()->View->render();
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -25,7 +24,7 @@ class AccionesController extends Controller{
             
             echo json_encode($data);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
@@ -33,11 +32,15 @@ class AccionesController extends Controller{
         try{
             $data =  self::$AccionesModel->getAlias();
             
-            $res = array('dataServer'=>$data, 'field'=> SimpleForm::getPost('_field'));
+            $res = array(
+                'dataServer'=>$data, 
+                'field'=> AxForm::getPost('_field'),
+                'opt'=>AxForm::getAll('_options')
+            );
             
             echo json_encode($res);
         }  catch (Exception $e){
-            self::$Auditoria->logErrors($e);
+            $this->auditar()->logErrors($e);
         }
     }
     
