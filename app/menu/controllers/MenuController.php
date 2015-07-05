@@ -7,11 +7,16 @@
  */
 class MenuController extends Controller{
     
-    use Auditoria,Validate;
+    use Auditoria,
+        MenuFilter,
+        Validate{
+            Validate::__construct as private __vaConstruct;
+        }
     
     private static $MenuModel;
 
     public function __construct() {
+        $this->__vaConstruct();
         self::$MenuModel = $this->loadModel();
     }
 
@@ -182,21 +187,34 @@ class MenuController extends Controller{
     
     public function postNewDominio(){ 
         try{
-            $this->valida()->input(T3.'txt_dominio')
-                    ->rule(
-                        array('require','xxxx'),
-                        array('length|4','nnnnnnnn')
-                    );
-            $this->valida()->input(T3.'txt_icono')
-                    ->rule(
-                        array('require','xxxx'),
-                        array('length|4','nnnnnnnn')
-                    );
+            $this->valida()
+            ->input(T3.'txt_dominio')
+                ->rule([
+                    'rule'=>'require',
+                    'msn'=>'xxxx'
+                ])
+                ->rule([
+                    'rule'=>'length|5',
+                    'msn'=>'mmmmmm'
+                ])
+            ->input(T3.'txt_icono')
+                ->rule([
+                    'rule'=>'require',
+                    'msn'=>'ccccc'
+                ])
+                ->rule([
+                    'rule'=>'length|4',
+                    'msn'=>'nnnnnnnn'
+                ]);
             
-            $data = self::$MenuModel->mantenimientoDominio();
+            if($this->valida()->isTrue()){
+                $data = self::$MenuModel->mantenimientoDominio();
+                $this->auditar()->logAuditoria(AUDI_9);
+            }else{
+                $data = $this->valida()->error();
+            }
         
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_9);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }

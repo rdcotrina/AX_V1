@@ -1,9 +1,15 @@
 <?php
 
 trait Validate{
+    
+    private $_obj;
 
-    public function valida(){
-        return new FormValidation();
+    public function __construct(){
+        $this->_obj = new FormValidation();
+    }
+    
+    public function valida() {
+        return $this->_obj;
     }
     
 }
