@@ -79,8 +79,8 @@ class FormValidation {
             foreach($value as $rule){
                 $ru = explode(':', $rule['rule']);
                 
-                $regla  = strtolower($ru[0]);    /*la regla para validar*/
-                $params = isset($ru[1])?$ru[1]:null;   /*los parametros*/
+                $regla  = strtolower($ru[0]);           /*la regla para validar*/
+                $params = isset($ru[1])?$ru[1]:null;    /*los parametros*/
                 
                 /*se ejecuta validacion segun la regla enviada y guardo los errores*/
                 $error[] = $this->$regla($element,$regla,$params);      
