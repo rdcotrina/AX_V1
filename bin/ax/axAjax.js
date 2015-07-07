@@ -98,6 +98,7 @@ var axAjax_ = function(){
                 }
             },
             success: function(data){
+                var er = 1;
                 /*validar error del SP*/
                 if(typeData === 'json' && data.length>0 || data.error !== undefined){
                     /*no es un array, servidor devuelve cadena, y el unico q devuelve cadena es el ERROR del SP*/
@@ -109,6 +110,7 @@ var axAjax_ = function(){
                         axScript.notify.error({
                             content: msn
                         });
+                        er = 0;
                     }
                 }
                 if(obj.fnCallback !== undefined){//si existe callback
@@ -120,7 +122,7 @@ var axAjax_ = function(){
                     _private.processObjetoOut(obj.element);//respuesta de servidor finalizada
                 } 
                 /*limpia el formulario*/
-                if(obj.clear !== undefined && obj.clear !== false && parseInt(data.duplicado) !== 1){
+                if(obj.clear !== undefined && obj.clear !== false && parseInt(data.duplicado) !== 1 && er){
                     _private.clear(obj.form);
                 }
                 /*se desactiva gif loading*/

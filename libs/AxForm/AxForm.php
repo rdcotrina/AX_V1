@@ -22,7 +22,7 @@ class AxForm{
             if(is_array($_POST[$parametro])){
                 $p = array();
                 foreach ($_POST[$parametro] as $value) {
-                    $p[] = htmlspecialchars(trim($value),ENT_QUOTES);;
+                    $p[] = htmlspecialchars(trim($value),ENT_QUOTES);
                 }
                 $_POST[$parametro] = $p;
                 return $_POST[$parametro];
@@ -40,7 +40,7 @@ class AxForm{
             if(is_array($_REQUEST[$parametro])){
                 $p = array();
                 foreach ($_REQUEST[$parametro] as $value) {
-                    $p[] = htmlspecialchars(trim($value),ENT_QUOTES);;
+                    $p[] = htmlspecialchars(trim($value),ENT_QUOTES);
                 }
                 $_REQUEST[$parametro] = $p;
                 return $_REQUEST[$parametro];

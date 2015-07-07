@@ -8,15 +8,14 @@
 class MenuController extends Controller{
     
     use Auditoria,
-        MenuFilter,
-        Validate{
-            Validate::__construct as private __vaConstruct;
+        MenuFilter{
+            MenuFilter::__construct as private __mfConstruct;
         }
     
     private static $MenuModel;
 
     public function __construct() {
-        $this->__vaConstruct();
+        $this->__mfConstruct();
         self::$MenuModel = $this->loadModel();
     }
 
@@ -187,33 +186,12 @@ class MenuController extends Controller{
     
     public function postNewDominio(){ 
         try{
-            $this->valida()
-            ->input(T3.'txt_dominio')
-                ->rule([
-                    'rule'=>'require',
-                    'msn'=>'xxxx'
-                ])
-                ->rule([
-                    'rule'=>'length|5',
-                    'msn'=>'mmmmmm'
-                ])
-            ->input(T3.'txt_icono')
-                ->rule([
-                    'rule'=>'require',
-                    'msn'=>'ccccc'
-                ])
-                ->rule([
-                    'rule'=>'length|4',
-                    'msn'=>'nnnnnnnn'
-                ]);
-            
-            if($this->valida()->isTrue()){
-                $data = self::$MenuModel->mantenimientoDominio();
-                $this->auditar()->logAuditoria(AUDI_9);
+            if($this->isValidate()){
+                //$data = self::$MenuModel->mantenimientoDominio();
+                //$this->auditar()->logAuditoria(AUDI_9);
             }else{
-                $data = $this->valida()->error();
+                $data = $this->valida()->messages();
             }
-        
             echo json_encode($data);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);

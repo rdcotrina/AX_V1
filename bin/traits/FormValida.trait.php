@@ -1,6 +1,6 @@
 <?php
 
-trait Validate{
+trait FormValida{
     
     private $_obj;
 
