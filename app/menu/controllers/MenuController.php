@@ -186,9 +186,9 @@ class MenuController extends Controller{
     
     public function postNewDominio(){ 
         try{
-            if($this->isValidate()){
-                //$data = self::$MenuModel->mantenimientoDominio();
-                //$this->auditar()->logAuditoria(AUDI_9);
+            if($this->isValidateDominio()){
+                $data = self::$MenuModel->mantenimientoDominio();
+                $this->auditar()->logAuditoria(AUDI_9);
             }else{
                 $data = $this->valida()->messages();
             }
@@ -200,10 +200,13 @@ class MenuController extends Controller{
     
     public function postEditDominio(){ 
         try{
-            $data = self::$MenuModel->mantenimientoDominio();
-        
+            if($this->isValidateDominio()){
+                $data = self::$MenuModel->mantenimientoDominio();
+                $this->auditar()->logAuditoria(AUDI_10);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_10);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -222,10 +225,13 @@ class MenuController extends Controller{
     
     public function postNewModulo(){ 
         try{
-            $data = self::$MenuModel->mantenimientoModulo();
-        
+            if($this->isValidateModulo()){
+                $data = self::$MenuModel->mantenimientoModulo();
+                $this->auditar()->logAuditoria(AUDI_12);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_12);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -233,10 +239,13 @@ class MenuController extends Controller{
     
     public function postEditModulo(){ 
         try{
-            $data = self::$MenuModel->mantenimientoModulo();
-        
+            if($this->isValidateModulo()){
+                $data = self::$MenuModel->mantenimientoModulo();
+                $this->auditar()->logAuditoria(AUDI_13);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_13);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -255,10 +264,13 @@ class MenuController extends Controller{
     
     public function postNewMenu(){ 
         try{
-            $data = self::$MenuModel->mantenimientoMenuPrincipal();
-        
+            if($this->isValidateMenu()){
+                $data = self::$MenuModel->mantenimientoMenuPrincipal();
+                $this->auditar()->logAuditoria(AUDI_15);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_15);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -266,10 +278,13 @@ class MenuController extends Controller{
     
     public function postEditMenu(){ 
         try{
-            $data = self::$MenuModel->mantenimientoMenuPrincipal();
-        
+            if($this->isValidateMenu()){
+                $data = self::$MenuModel->mantenimientoMenuPrincipal();
+                $this->auditar()->logAuditoria(AUDI_16);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_16);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -288,10 +303,13 @@ class MenuController extends Controller{
     
     public function postNewOpcion(){ 
         try{
-            $data = self::$MenuModel->mantenimientoOpcion();
-        
+            if($this->isValidateOpcion()){
+                $data = self::$MenuModel->mantenimientoOpcion();
+                $this->auditar()->logAuditoria(AUDI_18);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_18);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }
@@ -299,10 +317,13 @@ class MenuController extends Controller{
     
     public function postEditOpcion(){ 
         try{
-            $data = self::$MenuModel->mantenimientoOpcion();
-        
+            if($this->isValidateOpcion()){
+                $data = self::$MenuModel->mantenimientoOpcion();
+                $this->auditar()->logAuditoria(AUDI_19);
+            }else{
+                $data = $this->valida()->messages();
+            }
             echo json_encode($data);
-            $this->auditar()->logAuditoria(AUDI_19);
         }  catch (Exception $e){
             $this->auditar()->logErrors($e);
         }

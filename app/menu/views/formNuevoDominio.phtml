@@ -81,21 +81,16 @@ $grabar = Session::getPermiso('MNUGR');
     $('.xhelp').tooltip({placement:'right'});
     $('#<?php echo T3; ?>formNuevoDominio').validate({
         // Rules for form validation
-//        rules : {
-//                <?php echo T3; ?>txt_dominio : {
-//                        required : true,
-//                        minlength: 5
-//                },
-//                <?php echo T3; ?>txt_icono : {
-//                        required : true,
-//                        minlength: 5
-//                },
-//                <?php echo T3; ?>txt_orden : {
-//                        required : true,
-//                        number: true,
-//                        maxlength: 2
-//                }
-//        },
+        rules : {
+                <?php echo T3; ?>txt_dominio : {
+                        required : true,
+                        minlength: 5
+                },
+                <?php echo T3; ?>txt_icono : {
+                        required : true,
+                        minlength: 5
+                }
+        },
 
         // Do not change code below
         errorPlacement : function(error, element) {
