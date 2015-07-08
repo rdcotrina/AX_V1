@@ -532,6 +532,15 @@ var axScript_ = function() {
             }
         }
     };
+    
+    /*
+     * Refresca un datagrid
+     * @param {type} grid
+     * @returns {undefined}
+     */
+    _public.refreshGrid = function(grid){
+        $('#btnRefresh_'+grid).click();
+    };
 
     return _public;
 

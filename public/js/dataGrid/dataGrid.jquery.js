@@ -84,12 +84,23 @@
             
             _private.spinner = 'public/img/spinner-mini.gif';
             
-            _private.iniLoading = function(oSettings){
-                $('#btnRefresh_'+oSettings.tObjectTable).html('<img src="'+_private.spinner+'">').attr('disabled',true);
+            _private.htmlBtn = '';
+            
+            _private.iniLoading = function(oSettings,btn){
+                if(btn !== undefined){
+                    _private.htmlBtn = $(btn).html();
+                    $(btn).html('<img src="'+_private.spinner+'">').attr('disabled',true);
+                }else{
+                    $('#btnRefresh_'+oSettings.tObjectTable).html('<img src="'+_private.spinner+'">').attr('disabled',true);
+                }
             };
             
-            _private.endLoading = function(oSettings){
-                $('#btnRefresh_'+oSettings.tObjectTable).html('<i class="fa fa-refresh"></i>').attr('disabled',false);
+            _private.endLoading = function(oSettings,btn){
+                if(btn !== undefined){
+                   $(btn).html(_private.htmlBtn).attr('disabled',false); 
+                }else{
+                    $('#btnRefresh_'+oSettings.tObjectTable).html('<i class="fa fa-refresh"></i>').attr('disabled',false);
+                }
             };           
             
             /*
@@ -342,7 +353,7 @@
             _private.ajaxExport = function(oSettings,params,doc,btn){
                 $(btn).attr('disabled',true);
                 /*inica efecto loading*/
-                _private.iniLoading(oSettings);
+                _private.iniLoading(oSettings,btn);
                 
                 $.ajax({
                     type: "POST",
@@ -375,7 +386,7 @@
                         }
 
                         /*finaliza efecto loading*/
-                        _private.endLoading(oSettings);
+                        _private.endLoading(oSettings,btn);
                         
                         $(btn).attr('disabled',false);
                     }
@@ -446,6 +457,7 @@
                     if(sExport.buttons.excel && sExport.buttons.excel !== undefined){
                         var btnExcel = $('<button></button>');
                         btnExcel.attr('type','button');
+                        btnExcel.attr('id','btnEexcel_'+oSettings.tObjectTable);
                         btnExcel.addClass('btn btn-default');
                         btnExcel.html('<i class="fa fa-file-excel-o"></i> Excel');
                         btnExcel.click(function(){
@@ -461,6 +473,7 @@
                         var btnPDF = $('<button></button>');
                         btnPDF.attr('type','button');
                         btnPDF.addClass('btn btn-default');
+                        btnPDF.attr('id','btnEexcel_'+oSettings.tObjectTable);
                         btnPDF.html('<i class="fa fa-file-pdf-o"></i> PDF');
                         btnPDF.click(function(){
                             _private.ajaxExport(oSettings,params,'P',this);
@@ -1597,7 +1610,8 @@
                             $('#btnRefresh_' + oSettings.tObjectTable).off('click');
                             $('#btnRefresh_' + oSettings.tObjectTable).click(function() {
                                 oSettings.pDisplayStart = numero - 1;
-                                $.method.sendAjax(oSettings);
+                                //$.method.sendAjax(oSettings);
+                                _private.executeFilter(oSettings);      /*al actuaizar debe mandar los filtros*/
                             });
                         }
                     }
@@ -2262,11 +2276,16 @@
                                 
                                 /*finaliza efecto loading*/
                                 _private.endLoading(oSettings);
-                        
+                       
                                 /*oculto lo eventos de la grilla: button, a, chk_all*/
                                 axScript.removeAttr.click({
                                     container: "#"+oSettings.tObjectTable,
                                     typeElement: "button, a, span, #"+oSettings.tObjectTable+"_chkall_0 input:checkbox"
+                                }); 
+                                
+                                axScript.removeAttr.click({
+                                    container: "#"+oSettings.tObjectContainer,
+                                    typeElement: "button"
                                 }); 
                                 
                                 /*ejecutar el scroll*/

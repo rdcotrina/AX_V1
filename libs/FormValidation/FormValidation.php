@@ -242,7 +242,7 @@ class FormValidation {
         $ini = $pr[0];
         $fin = $pr[1];
 
-        if(strlen(AxForm::getPost($element)) >= $ini && strlen(AxForm::getPost($element)) <= $fin){
+        if(strlen(AxForm::getPost($element)) >= $ini || strlen(AxForm::getPost($element)) <= $fin){
             return true;
         }elseif(AxForm::getPost($element)){
             $this->addMsn($element,$regla,$ini,$fin);

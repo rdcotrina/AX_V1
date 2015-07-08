@@ -1,6 +1,14 @@
 <?php
 
 class AccionesModel extends Database{
+    private $_flag;
+    private $_key;
+    private $_accion;
+    private $_alias;
+    private $_activo;
+    private $_icono;
+    private $_theme;
+    private $_usuario;
     
     /*para el grid*/
     private $_pDisplayStart;
@@ -16,6 +24,16 @@ class AccionesModel extends Database{
     }
     
     private function _set(){
+        $this->_flag    = AxForm::getPost('_flag');
+        //$this->_key     = Aes::de(AxForm::getPost('_key'));    /*se decifra*/
+        $this->_key     = AxForm::getPost('_key');
+        $this->_accion  = AxForm::getPost(T2.'txt_accion');
+        $this->_alias   = AxForm::getPost(T2.'txt_alias');
+        $this->_icono   = AxForm::getPost(T2.'txt_icono');
+        $this->_theme   = AxForm::getPost(T2.'txt_theme');
+        $this->_activo  = AxForm::getPost(T2.'chk_activo');
+        $this->_usuario = Session::get('sys_idUsuario');
+        
         $this->_pDisplayStart  =   AxForm::getPost("pDisplayStart"); 
         $this->_pDisplayLength =   AxForm::getPost("pDisplayLength"); 
         $this->_pSortingCols   =   AxForm::getPost("pSortingCols");
@@ -25,7 +43,7 @@ class AccionesModel extends Database{
     }
     
     public function getGridAcciones(){
-        $query = "call sp_rolesAccionesGrid(:iDisplayStart,:iDisplayLength,:pOrder,:pFilterCols,:sExport);";
+        $query = "call sp_confAccionesGrid(:iDisplayStart,:iDisplayLength,:pOrder,:pFilterCols,:sExport);";
         $parms = array(
             ":iDisplayStart" => $this->_pDisplayStart,
             ":iDisplayLength" => $this->_pDisplayLength,
@@ -38,8 +56,24 @@ class AccionesModel extends Database{
         return $data;
     }
     
+    public function mantenimiento(){
+        $query = "call sp_confAccionesMantenimiento(:flag,:key,:accion,:alias,:activo,:icono,:theme,:usuario);";
+        $parms = array(
+            ':flag' => $this->_flag,
+            ':key' => $this->_key,
+            ':accion' => $this->_accion,
+            ':alias' => $this->_alias,
+            ':activo' => ($this->_activo == 'A')?$this->_activo:'I',
+            ':icono' => $this->_icono,
+            ':theme' => $this->_theme,
+            ':usuario' => $this->_usuario
+        );
+        $data = $this->queryOne($query,$parms);
+        return $data;
+    }
+    
     public function getAlias(){
-        $query = "call sp_rolesAccionesConsultas(:flag,:criterio);";
+        $query = "call sp_confAccionesConsultas(:flag,:criterio);";
         
         $parms = array(
             ":flag" => 2,
@@ -47,6 +81,16 @@ class AccionesModel extends Database{
         );
         $data = $this->queryAll($query,$parms);
        
+        return $data;
+    }
+    
+    public function getAccion(){
+        $query = "call sp_confAccionesConsultas(:flag,:criterio);";
+        $parms = array(
+            ':flag' => 1,
+            ':criterio' => $this->_key
+        );
+        $data = $this->queryOne($query,$parms);
         return $data;
     }
     

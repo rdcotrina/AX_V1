@@ -1,0 +1,129 @@
+<?php
+$found = Obj::run()->AccionesController->getAccion();
+
+$edit = Session::getPermiso('ACCACT');
+
+$Form = new FormFactory([
+            "title"=>AXI_5,
+            "alias"=>T2,
+            "ajaxSubmit"=>"Acciones.postEditAccion();",
+            "attr"=>[
+                "id"=>"formEditAccion",
+                "name"=>"formEditAccion",
+                "class"=>"modal fade"
+            ],
+            "noSubmit"=>$edit['permiso'] //cuando no tiene permiso de grabar, el enter en elementos no funciona
+        ]);
+
+$Form->addField([
+    "label"=>[
+        "label"=>AXI_6,
+        "attr"=>["class"=>"label col col-2"]
+    ],
+    "field"=>[
+        "attr"=>[
+            "type"=>"text",
+            "id"=>"txt_accion",
+            "name"=>"txt_accion",
+            "value"=>$found['accion']
+        ],
+        "help"=>AXI_10,
+        "iconrequired"=>true,
+        "validate"=>["required:true","minlength:3"]
+    ]
+]);
+
+$Form->addField([
+    "label"=>[
+        "label"=>AXI_7,
+        "attr"=>["class"=>"label col col-2"]
+    ],
+    "field"=>[
+        "csswidth"=>"col col-3",
+        "attr"=>[
+            "type"=>"text",
+            "id"=>"txt_alias",
+            "name"=>"txt_alias",
+            "value"=>$found['alias']
+        ],
+        "help"=>AXI_11,
+        "iconrequired"=>true,
+        "validate"=>["required:true","rangelength:[2,5]"]
+    ]
+]);
+
+$Form->addField([
+    "label"=>[
+        "label"=>AXI_8,
+        "attr"=>["class"=>"label col col-2"]
+    ],
+    "field"=>[
+        "attr"=>[
+            "type"=>"text",
+            "id"=>"txt_icono",
+            "name"=>"txt_icono",
+            "value"=>$found['icono']
+        ],
+        "help"=>AXI_12,
+        "iconrequired"=>true,
+        "validate"=>["required:true","minlength:3"]
+    ]
+]);
+
+$Form->addField([
+    "label"=>[
+        "label"=>AXI_9,
+        "attr"=>["class"=>"label col col-2"]
+    ],
+    "field"=>[
+        "attr"=>[
+            "type"=>"text",
+            "id"=>"txt_theme",
+            "name"=>"txt_theme",
+            "value"=>$found['theme']
+        ],
+        "help"=>AXI_13,
+        "iconrequired"=>true,
+        "validate"=>["required:true","minlength:3"]
+    ]
+]);
+
+$Form->addField([
+    "label"=>[
+        "label"=>CK_ACTIVO,
+        "attr"=>["class"=>"label col col-2"]
+    ],
+    "field"=>[
+        "csswidth"=>"col col-3",
+        "attr"=>[
+            "type"=>"checkbox",
+            "id"=>"chk_activo",
+            "name"=>"chk_activo",
+            "value"=>"A",
+            "checked"=>($found['estado'] == 'A')?true:false
+        ]
+    ]
+]);
+
+if($edit['permiso']){
+    $Form->addButton([
+        "label"=>$edit['accion'],
+        "icon"=>$edit['icono'],
+        "attr"=>[
+            "id"=>"btnEdAccion",
+            "type"=>"submit",
+            "class"=>$edit['theme']
+        ]
+    ]);
+}
+
+$Form->addButton([
+    "label"=>BTN_CLOSE,
+    "icon"=>ICON_CLOSE,
+    "attr"=>[
+        "type"=>"button",
+        "class"=>THEME_CLOSE
+    ]
+]);
+
+$Form->view(); 

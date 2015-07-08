@@ -85,7 +85,7 @@ $grabar = Session::getPermiso('MNUGR');
 <!-- si no riene permiso se anula submit desde cualquier input -->
 <?php if(!$grabar['permiso']): ?>
 <script>
-    simpleScript.noSubmit('#<?php echo T3; ?>formNewOpcion');
+    axScript.noSubmit('#<?php echo T3; ?>formNewOpcion');
 </script>
 <?php endif; ?>
 <script>

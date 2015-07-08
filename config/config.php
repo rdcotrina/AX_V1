@@ -20,6 +20,7 @@ define('APP_PASS_KEY','99}dF7EZbnbXOkojf&dzvxd5q#guPbPK1spU75Jm|N79Ii7PK');
 define('APP_COD_SADM','0001');
 define('APP_COD_ADM','0002');
 define('APP_COPY','AX FRAMEWORK');
+define('APP_LANG','ES');    
 
 define('DB_ENTORNO','D');  /*D=DESARROLLO, P=PRODUCCION*/
 define('DB_MOTOR','mysql');
@@ -50,7 +51,7 @@ spl_autoload_register('autoloadCore');
 spl_autoload_register('autoloadLibs');
 
 require_once (ROOT . 'config' . DS . 'prefijosPHP.php');
-require_once (ROOT . 'lang' . DS . 'php' . DS . 'lang_ES.php');
+require_once (ROOT . 'lang' . DS . 'php' . DS . 'lang_'.APP_LANG.'.php');
 require_once (ROOT . 'bin' . DS . 'Autoload.php');
 
 /*load traits*/

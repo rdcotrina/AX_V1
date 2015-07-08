@@ -241,7 +241,6 @@ var Menu_ = function() {
                 element: '#' + tabs.T3 + 'btnGrabaDominio',
                 root: _private.config.modulo + 'postNewDominio',
                 form: '#' + tabs.T3 + 'formNuevoDominio',
-                clear: true,
                 fnCallback: function(data) {
                     if (!isNaN(data.result) && parseInt(data.result) === 1) {
                         axScript.notify.ok({
@@ -273,7 +272,6 @@ var Menu_ = function() {
                 element: '#' + tabs.T3 + 'btnEditaDominio',
                 root: _private.config.modulo + 'postEditDominio',
                 form: '#' + tabs.T3 + 'formEditDominio',
-                clear: true,
                 fnServerParams: function(sData) {
                     sData.push({name: '_idDominio', value: _private.idDominio});
                 },
@@ -345,7 +343,6 @@ var Menu_ = function() {
                 fnServerParams: function(sData) {
                     sData.push({name: '_idDominio', value: _private.idDominio});
                 },
-                clear: true,
                 fnCallback: function(data) {
                     if (!isNaN(data.result) && parseInt(data.result) === 1) {
                         axScript.notify.ok({
@@ -374,7 +371,6 @@ var Menu_ = function() {
                 element: '#' + tabs.T3 + 'btnEditarModulo',
                 root: _private.config.modulo + 'postEditModulo',
                 form: '#' + tabs.T3 + 'formEditModulo',
-                clear: true,
                 fnServerParams: function(sData) {
                     sData.push({name: '_idModulo', value: _private.idModulo});
                     sData.push({name: '_idDominio', value: _private.idDominio});
@@ -444,7 +440,6 @@ var Menu_ = function() {
                 fnServerParams: function(sData) {
                     sData.push({name: '_idModulo', value: _private.idModulo});
                 },
-                clear: true,
                 fnCallback: function(data) {
                     if (!isNaN(data.result) && parseInt(data.result) === 1) {
                         axScript.notify.ok({
@@ -472,7 +467,6 @@ var Menu_ = function() {
                 element: '#' + tabs.T3 + 'btnEditarMenuPri',
                 root: _private.config.modulo + 'postEditMenu',
                 form: '#' + tabs.T3 + 'formEditMenu',
-                clear: true,
                 fnServerParams: function(sData) {
                     sData.push({name: '_idMenuPrincipal', value: _private.idMenuPrincipal});
                     sData.push({name: '_idModulo', value: _private.idModulo});
@@ -542,7 +536,6 @@ var Menu_ = function() {
                 fnServerParams: function(sData) {
                     sData.push({name: '_idMenuPrincipal', value: _private.idMenuPrincipal});
                 },
-                clear: true,
                 fnCallback: function(data) {
                     if (!isNaN(data.result) && parseInt(data.result) === 1) {
                         axScript.notify.ok({
@@ -578,7 +571,6 @@ var Menu_ = function() {
                 element: '#' + tabs.T3 + 'btnEDOPC',
                 root: _private.config.modulo + 'postEditOpcion',
                 form: '#' + tabs.T3 + 'formEditOpcion',
-                clear: true,
                 fnServerParams: function(sData) {
                     sData.push({name: '_idOpcion', value: _private.idOpcion});
                     sData.push({name: '_idMenuPrincipal', value: _private.idMenuPrincipal});

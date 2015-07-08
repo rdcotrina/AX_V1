@@ -103,3 +103,18 @@ define('AUDI_20','Eliminar opción');
 
 /*=====================================ACCIONES==================================*/
 define('AXI_1','Acciones');
+define('AXI_2','Formulario nueva acción');
+define('AXI_3','Formulario editar acción');
+define('AXI_4','Nueva Acción');
+define('AXI_5','Editar Acción');
+define('AXI_6','Acción');
+define('AXI_7','Alias');
+define('AXI_8','Icono');
+define('AXI_9','Theme');
+define('AXI_10','Ingrese el nombre de la acción');
+define('AXI_11','Alias debe ser entre 2 y 5 caracteres');
+define('AXI_12','Css para el icono del botón');
+define('AXI_13','Css para el diseño del botón');
+define('AXI_14','Grabar nueva acción');
+define('AXI_15','Actualizar acción');
+define('AXI_16','Eliminar acción');

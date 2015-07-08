@@ -1,16 +1,10 @@
 var Acciones_ = function() {
 
-    /*cargar requires*/
-//    try{
-//        axExe.require({
-//            menu: 'MenuScript'
-//        });
-//    }catch (ex){
-//        auditoria.logErrors(ex);
-//    }
-    
-
     var _private = {};
+    
+    _private.idAccion = 0;
+    
+    _private.idGrid   = '';
 
     _private.config = {
         modulo: 'acciones/Acciones/'
@@ -103,7 +97,7 @@ var Acciones_ = function() {
                 icono: pNew.icono,
                 titulo: pNew.accion,
                 class: pNew.theme,
-                ajax: "Empleados.getFormEditEmpleados();"
+                ajax: "Acciones.getFormNuevaAccion(this);"
             }],
         sExport:{
                 buttons:{excel:true,pdf:true},
@@ -112,7 +106,6 @@ var Acciones_ = function() {
                 caption: 'RELACIÓN DE ACCIONES',
                 columns:[
                     {title:lang.Acciones.AXION ,field:'accion',type: 'string'},
-                    {title:lang.Acciones.DISEN ,field:'disenio'},
                     {title:lang.Acciones.ALAIS ,field:'alias'},
                     {title:lang.generic.EST ,field:'estado'}
                 ]
@@ -125,7 +118,7 @@ var Acciones_ = function() {
                     titulo: pEdit.accion,
                     class: pEdit.theme,
                     ajax: {
-                        fn: "Empleados.getFormEditEmpleados",
+                        fn: "Acciones.getEditAccion",
                         serverParams: "id_acciones"
                     }
                 }, {
@@ -134,7 +127,7 @@ var Acciones_ = function() {
                     titulo: pDelete.accion,
                     class: pDelete.theme,
                     ajax: {
-                        fn: "Empleados.postDeleteEmpleados",
+                        fn: "Acciones.postDeleteAccion",
                         serverParams: "id_acciones"
                     }
                 }]
@@ -144,7 +137,7 @@ var Acciones_ = function() {
             },
             ajaxSource: _private.config.modulo+"getGridAcciones",
             fnCallback: function(oSettings) {
-                
+                _private.idGrid = oSettings.tObjectTable;
             }
         });
         setup_widgets_desktop();
@@ -320,6 +313,142 @@ var Acciones_ = function() {
             }
         });
         setup_widgets_desktop();
+    };
+    
+    _public.getFormNuevaAccion = function(btn) {
+        try {
+            axAjax.send({
+                element: btn,
+                dataType: 'html',
+                root: _private.config.modulo + 'formNuevaAccion',
+                fnCallback: function(data) {
+                    $('#cont-modal').append(data);  /*los formularios con append*/
+                    $('#' + tabs.T2 + 'formNuevaAccion').modal('show');
+                }
+            });
+        } catch (ex) {
+            auditoria.logErrors(ex);
+        }
+    };
+    
+    _public.getEditAccion = function(btn,id) {
+        try {
+            _private.idAccion = id;
+
+            axAjax.send({
+                dataType: 'html',
+                element: btn,
+                root: _private.config.modulo + 'formEditAccion',
+                fnServerParams: function(sData) {
+                    sData.push({name: '_key', value: _private.idAccion});
+                },
+                fnCallback: function(data) {
+                    $('#cont-modal').append(data);
+                    $('#' + tabs.T2 + 'formEditAccion').modal('show');
+                }
+            });
+        } catch (ex) {
+            auditoria.logErrors(ex);
+        }
+    };
+    
+    _public.postNuevaAccion = function() {
+        try {
+            axAjax.send({
+                flag: 1,
+                element: '#' + tabs.T2 + 'btnGrabaAccion',
+                root: _private.config.modulo + 'postNuevaAccion',
+                form: '#' + tabs.T2 + 'formNuevaAccion',                
+                fnCallback: function(data) {
+                    if (!isNaN(data.result) && parseInt(data.result) === 1) {
+                        axScript.notify.ok({
+                            content: lang.mensajes.MSG_3,
+                            callback: function() {
+                                axScript.refreshGrid(_private.idGrid);
+                            }
+                        });
+                    } else if (!isNaN(data.result) && parseInt(data.result) === 2) {
+                        axScript.notify.error({
+                            content: lang.Acciones.EXISTAXION
+                        });
+                    } else if (!isNaN(data.result) && parseInt(data.result) === 3) {
+                        axScript.notify.error({
+                            content: lang.Acciones.EXISTALAIS
+                        });
+                    }
+                }
+            });
+        } catch (ex) {
+            auditoria.logErrors(ex);
+        }
+    };
+    
+    _public.postEditAccion = function() {
+        try {
+            axAjax.send({
+                flag: 2,
+                element: '#' + tabs.T2 + 'btnEdAccion',
+                root: _private.config.modulo + 'postEditAccion',
+                form: '#' + tabs.T2 + 'formEditAccion',     
+                fnServerParams: function(sData) {
+                    sData.push({name: '_key', value: _private.idAccion});
+                },
+                fnCallback: function(data) {
+                    if (!isNaN(data.result) && parseInt(data.result) === 1) {
+                        axScript.notify.ok({
+                            content: lang.mensajes.MSG_3,
+                            callback: function() {
+                                axScript.closeModal('#' + tabs.T2 + 'formEditAccion');
+                                axScript.refreshGrid(_private.idGrid);
+                                _private.idAccion = 0;
+                            }
+                        });
+                    } else if (!isNaN(data.result) && parseInt(data.result) === 2) {
+                        axScript.notify.error({
+                            content: lang.Acciones.EXISTAXION
+                        });
+                    } else if (!isNaN(data.result) && parseInt(data.result) === 3) {
+                        axScript.notify.error({
+                            content: lang.Acciones.EXISTALAIS
+                        });
+                    }
+                }
+            });
+        } catch (ex) {
+            auditoria.logErrors(ex);
+        }
+    };
+    
+    _public.postDeleteAccion = function(btn,id){
+        try {
+            _private.idAccion = id;
+
+            axScript.notify.confirm({
+                content: lang.mensajes.MSG_5,
+                callbackSI: function() {
+                    axAjax.send({
+                        flag: 3,
+                        element: btn,
+                        root: _private.config.modulo + 'postDeleteAccion',
+                        fnServerParams: function(sData) {
+                            sData.push({name: '_key', value: _private.idAccion});
+                        },
+                        fnCallback: function(data) {
+                            if (!isNaN(data.result) && parseInt(data.result) === 1) {
+                                axScript.notify.ok({
+                                    content: lang.mensajes.MSG_6,
+                                    callback: function() {
+                                        axScript.refreshGrid(_private.idGrid);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        } catch (ex) {
+            auditoria.logErrors(ex);
+        }
     };
     
     return _public;

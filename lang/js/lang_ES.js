@@ -58,3 +58,5 @@ lang.Acciones = {};
 lang.Acciones.AXION = 'Acción';
 lang.Acciones.DISEN = 'Diseño';
 lang.Acciones.ALAIS = 'Alias';
+lang.Acciones.EXISTAXION = 'Acción ya existe';
+lang.Acciones.EXISTALAIS = 'Alias ya existe';

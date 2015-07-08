@@ -77,6 +77,8 @@ var axAjax_ = function(){
         }
         
         var typeData = (obj.dataType !== undefined)?obj.dataType:'json';
+        var clear = (obj.clear === undefined)?true:obj.clear;
+        
         if(obj.flag !== undefined) { _private.sData.push({name: '_flag', value: obj.flag}); }
         if(obj.fnServerParams !== undefined){ obj.fnServerParams(_private.sData); }
      
@@ -122,7 +124,7 @@ var axAjax_ = function(){
                     _private.processObjetoOut(obj.element);//respuesta de servidor finalizada
                 } 
                 /*limpia el formulario*/
-                if(obj.clear !== undefined && obj.clear !== false && parseInt(data.duplicado) !== 1 && er){
+                if(clear && parseInt(data.duplicado) !== 1 && er && obj.form !== undefined){
                     _private.clear(obj.form);
                 }
                 /*se desactiva gif loading*/

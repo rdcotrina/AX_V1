@@ -88,7 +88,7 @@ $found = Obj::run()->MenuController->findOpcion();
 <!-- si no riene permiso se anula submit desde cualquier input -->
 <?php if(!$editar['permiso']): ?>
 <script>
-    simpleScript.noSubmit('#<?php echo T3; ?>formEditOpcion');
+    axScript.noSubmit('#<?php echo T3; ?>formEditOpcion');
 </script>
 <?php endif; ?>
 <script>
